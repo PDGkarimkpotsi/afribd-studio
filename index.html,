@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#173d32">
+<title>AfriBD Studio — Atelier de scènes</title>
+<style>
+:root{--green:#173d32;--gold:#e8b85b;--paper:#fffaf0;--ink:#202a25;--muted:#68736c;--line:#dce4dc;--card:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:#f1f4ef;color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:var(--green);color:white;padding:22px 16px 20px}
+.wrap{max-width:900px;margin:auto}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:48px;height:48px;border-radius:14px;background:var(--gold);color:var(--green);display:grid;place-items:center;font-size:25px;font-weight:900}
+h1{font-size:1.45rem;line-height:1.15;margin:0}
+header p{margin:8px 0 0;color:#e2eee7;font-size:.94rem}
+main{max-width:900px;margin:16px auto;padding:0 12px 36px;display:grid;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 3px 12px #173d3209}
+h2{font-size:1.08rem;margin:0 0 12px}
+label{display:block;font-weight:650;font-size:.92rem;margin:12px 0 5px}
+input,select,textarea{width:100%;font:inherit;border:1px solid #cbd6cc;border-radius:11px;padding:11px 12px;background:white;color:var(--ink)}
+textarea{min-height:96px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button{border:0;border-radius:11px;padding:11px 14px;font:inherit;font-weight:700;cursor:pointer}
+.primary{background:var(--green);color:white}
+.secondary{background:#e8eee8;color:var(--green)}
+.danger{background:#fff0ec;color:#8b2c1c}
+.buttons{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.small{font-size:.85rem;color:var(--muted)}
+#prompt{min-height:190px;background:#fbfcf9}
+.scene{border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:10px}
+.scene h3{margin:0 0 5px;font-size:1rem}
+.scene p{margin:4px 0;overflow-wrap:anywhere}
+.scene .buttons{margin-top:9px}
+.notice{background:#fff7df;border:1px solid #efdc9e;padding:12px;border-radius:12px;font-size:.9rem}
+footer{text-align:center;color:var(--muted);font-size:.82rem;padding:8px 16px 26px}
+@media(max-width:560px){.row{grid-template-columns:1fr}header{padding:18px 14px}main{padding:0 10px 28px}.card{padding:14px}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="brand"><div class="logo">A</div><div><h1>AfriBD Studio</h1><div style="color:#f3dca8;font-weight:650">Atelier de scènes · Prototype 0.1</div></div></div>
+  <p>Imaginez une scène, préparez sa description visuelle et organisez vos idées de bande dessinée.</p>
+</div></header>
+<main>
+  <section class="card">
+    <h2>1. Construire une scène</h2>
+    <div class="row">
+      <div><label for="character">Personnage</label><select id="character">
+        <option value="Kossi, adolescent ouest-africain, peau brune, cheveux courts noirs, t-shirt jaune, pantalon bleu et sandales">Kossi — adolescent en jaune</option>
+        <option value="Ama, jeune femme ouest-africaine, peau brune, tresses noires, robe colorée et petites boucles d'oreilles">Ama — jeune femme aux tresses</option>
+        <option value="Yao, jeune adulte ouest-africain, peau brune, chemise verte, pantalon sombre et sac en bandoulière">Yao — jeune adulte en vert</option>
+        <option value="personnage original à définir selon la description de l'auteur">Personnage personnalisé</option>
+      </select></div>
+      <div><label for="setting">Décor</label><select id="setting">
+        <option>Rue d'un quartier populaire de Lomé, Togo</option>
+        <option>Marché animé d'Afrique de l'Ouest</option>
+        <option>Cour familiale avec murs en parpaings</option>
+        <option>Terrain de football de quartier en terre rouge</option>
+        <option>Petite boutique de quartier avec étagères et boissons</option>
+        <option>Arrêt de taxi-moto au bord d'une rue poussiéreuse</option>
+        <option>École de quartier en journée</option>
+        <option>Décor personnalisé décrit par l'auteur</option>
+      </select></div>
+    </div>
+    <div class="row">
+      <div><label for="pose">Cadrage / pose</label><select id="pose">
+        <option>Plan moyen, personnages visibles de la taille à la tête</option>
+        <option>Plan large montrant le quartier et l'environnement</option>
+        <option>Gros plan sur le visage et l'émotion</option>
+        <option>Vue par-dessus l'épaule pendant une conversation</option>
+        <option>Plan dynamique d'une course ou d'une dispute</option>
+      </select></div>
+      <div><label for="style">Style graphique</label><select id="style">
+        <option>BD africaine semi-réaliste, encrage propre et couleurs chaudes</option>
+        <option>Manga africain original, expressions marquées et lignes dynamiques</option>
+        <option>Dessin animé coloré, formes lisibles et ambiance chaleureuse</option>
+        <option>Roman graphique à l'encre, ombres travaillées et textures</option>
+        <option>BD jeunesse, dessin simple et couleurs franches</option>
+      </select></div>
+    </div>
+    <label for="action">Que se passe-t-il dans la scène ?</label>
+    <textarea id="action" placeholder="Ex. Kossi parle avec Ama devant une petite boutique. Ama semble inquiète, Kossi essaie de la rassurer."></textarea>
+    <label for="dialogue">Dialogue éventuel (facultatif)</label>
+    <textarea id="dialogue" style="min-height:68px" placeholder="Ama : Tu as entendu la nouvelle ?&#10;Kossi : Oui, il faut en parler aux autres."></textarea>
+    <label for="notes">Détails à préserver (facultatif)</label>
+    <input id="notes" placeholder="Ex. même t-shirt jaune, fin d'après-midi, moto rouge à gauche">
+    <div class="buttons"><button class="primary" id="generate">Préparer le prompt</button><button class="secondary" id="reset">Réinitialiser</button></div>
+  </section>
+
+  <section class="card">
+    <h2>2. Prompt prêt à copier</h2>
+    <p class="small">Copiez ce texte dans un générateur d'images. Pour garder un personnage cohérent, ajoutez sa fiche de référence ou une image existante si l'outil l'accepte.</p>
+    <textarea id="prompt" placeholder="Votre prompt apparaîtra ici…" readonly></textarea>
+    <div class="buttons"><button class="primary" id="copy">Copier le prompt</button><button class="secondary" id="downloadPrompt">Télécharger le prompt .txt</button><button class="secondary" id="openImage">Ouvrir un générateur d'images</button></div>
+    <div class="notice" style="margin-top:12px">Le bouton « Ouvrir » propose un service externe. Ses crédits, conditions et résultats dépendent de ce service. AfriBD Studio ne génère pas encore les images directement.</div>
+  </section>
+
+  <section class="card">
+    <h2>3. Mon carnet de scènes</h2>
+    <p class="small">Les scènes sont conservées dans le stockage local de ce navigateur sur ce téléphone. Elles ne sont pas encore synchronisées avec vos amis. Exportez une sauvegarde pour ne pas les perdre.</p>
+    <div class="buttons"><button class="primary" id="save">Enregistrer cette scène</button><button class="secondary" id="export">Exporter le carnet (.json)</button><button class="secondary" id="importButton">Importer un carnet</button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
+    <div id="scenes"><p class="small">Aucune scène enregistrée pour le moment.</p></div>
+  </section>
+  <section class="card">
+    <h2>4. Étapes suivantes</h2>
+    <ul>
+      <li>Tester les prompts avec plusieurs générateurs d'images.</li>
+      <li>Créer une fiche de référence illustrée pour chaque personnage principal.</li>
+      <li>Partager les fichiers JSON entre les membres de l'équipe.</li>
+      <li>Ajouter plus tard un compte utilisateur et une base de données collaborative.</li>
+    </ul>
+  </section>
+</main>
+<footer>AfriBD Studio · Prototype gratuit · Version 0.1</footer>
+<script>
+const $ = id => document.getElementById(id);
+const STORE = 'afribd_studio_scenes_v1';
+function makePrompt(){
+  const char=$('character').selectedOptions[0].text + ': ' + $('character').value;
+  const action=$('action').value.trim() || '[décrire précisément l’action des personnages]';
+  const dialogue=$('dialogue').value.trim();
+  const notes=$('notes').value.trim();
+  return `Créer UNE illustration de bande dessinée originale.\n\nPERSONNAGE : ${char}.\nDÉCOR : ${$('setting').value}.\nACTION : ${action}.\nCADRAGE ET POSE : ${$('pose').value}.\nSTYLE : ${$('style').value}.\n${dialogue ? 'DIALOGUE À INTÉGRER SI LE MODÈLE REND BIEN LE TEXTE :\n'+dialogue+'\n' : 'DIALOGUE : ne pas ajouter de texte ni de bulles non demandés.\n'}${notes ? 'DÉTAILS À RESPECTER : '+notes+'\n' : ''}\nCOHÉRENCE VISUELLE : respecter la même apparence, la même carnation, la coiffure, les vêtements et les accessoires du personnage décrits. Anatomie naturelle, mains lisibles, expressions crédibles, décor ouest-africain documenté et spécifique, composition claire, éclairage cohérent, contours nets, couleurs maîtrisées. Une seule scène, sans collage de plusieurs cases, sans logo, sans signature ni texte parasite.`;
+}
+function readScenes(){try{return JSON.parse(localStorage.getItem(STORE)||'[]')}catch(e){return []}}
+function writeScenes(s){localStorage.setItem(STORE,JSON.stringify(s))}
+function currentScene(){return {id:Date.now(),created:new Date().toISOString(),character:$('character').value,characterLabel:$('character').selectedOptions[0].text,setting:$('setting').value,pose:$('pose').value,style:$('style').value,action:$('action').value,dialogue:$('dialogue').value,notes:$('notes').value,prompt:$('prompt').value}}
+function renderScenes(){
+ const box=$('scenes'), items=readScenes();
+ if(!items.length){box.innerHTML='<p class="small">Aucune scène enregistrée pour le moment.</p>';return}
+ box.innerHTML='';
+ items.slice().reverse().forEach(item=>{
+   const div=document.createElement('div');div.className='scene';
+   const h=document.createElement('h3');h.textContent=item.characterLabel+' — '+item.setting;div.appendChild(h);
+   const p=document.createElement('p');p.textContent=item.action||'(Action non renseignée)';div.appendChild(p);
+   const b=document.createElement('div');b.className='buttons';
+   const load=document.createElement('button');load.className='secondary';load.textContent='Recharger';load.onclick=()=>loadScene(item.id);
+   const cp=document.createElement('button');cp.className='secondary';cp.textContent='Copier prompt';cp.onclick=()=>copyText(item.prompt);
+   const del=document.createElement('button');del.className='danger';del.textContent='Supprimer';del.onclick=()=>{if(confirm('Supprimer cette scène ?')){writeScenes(readScenes().filter(x=>x.id!==item.id));renderScenes()}};
+   b.append(load,cp,del);div.appendChild(b);box.appendChild(div);
+ });
+}
+function loadScene(id){
+ const s=readScenes().find(x=>x.id===id);if(!s)return;
+ $('character').value=s.character;$('setting').value=s.setting;$('pose').value=s.pose;$('style').value=s.style;
+ $('action').value=s.action;$('dialogue').value=s.dialogue;$('notes').value=s.notes;$('prompt').value=s.prompt;
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+async function copyText(t){
+ if(!t){alert('Préparez d’abord un prompt.');return}
+ try{await navigator.clipboard.writeText(t);alert('Copié !')}catch(e){
+  const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');alert('Copié !')}catch(err){alert('Copie impossible. Sélectionnez le texte manuellement.')}
+  ta.remove();
+ }
+}
+function download(name,text,type){
+ const blob=new Blob([text],{type});const url=URL.createObjectURL(blob);
+ const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+}
+$('generate').onclick=()=>{$('prompt').value=makePrompt();$('prompt').scrollIntoView({behavior:'smooth',block:'start'})};
+$('reset').onclick=()=>{if(confirm('Effacer les champs du formulaire ?')){['action','dialogue','notes','prompt'].forEach(id=>$(id).value='');$('character').selectedIndex=0;$('setting').selectedIndex=0;$('pose').selectedIndex=0;$('style').selectedIndex=0}};
+$('copy').onclick=()=>copyText($('prompt').value);
+$('downloadPrompt').onclick=()=>{if(!$('prompt').value)$('prompt').value=makePrompt();download('afribd-prompt.txt',$('prompt').value,'text/plain;charset=utf-8')};
+$('openImage').onclick=()=>window.open('https://huggingface.co/spaces','_blank','noopener');
+$('save').onclick=()=>{if(!$('prompt').value)$('prompt').value=makePrompt();const s=readScenes();s.push(currentScene());try{writeScenes(s);renderScenes();alert('Scène enregistrée sur ce téléphone.')}catch(e){alert('Stockage local indisponible ou plein. Exportez votre carnet et libérez de l’espace.')}};
+$('export').onclick=()=>download('afribd-carnet.json',JSON.stringify(readScenes(),null,2),'application/json');
+$('importButton').onclick=()=>$('importFile').click();
+$('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const incoming=JSON.parse(await f.text());if(!Array.isArray(incoming))throw Error();const existing=readScenes();const ids=new Set(existing.map(x=>x.id));incoming.forEach(x=>{if(!ids.has(x.id)){x.id=Date.now()+Math.floor(Math.random()*100000);existing.push(x)}});writeScenes(existing);renderScenes();alert('Carnet importé.')}catch(err){alert('Fichier JSON non valide.')}e.target.value=''};
+renderScenes();
+</script>
+</body>
+</html>
