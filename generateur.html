@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b7a4b">
+<title>Générateur guidé — AfriBD Studio</title>
+<link rel="icon" id="favicon" href="logo.png">
+<style>
+:root{--green:#0b7a4b;--green2:#13b36b;--gold:#ffc21a;--orange:#ff6b2c;--red:#e0312b;--blue:#1e88e5;--ink:#1f2a24;--muted:#5d6b63;--line:#f0dcae;--bg:#fff4dc}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:linear-gradient(120deg,var(--green),var(--green2) 55%,var(--gold) 130%);color:#fff;padding:18px 16px;border-bottom:6px solid var(--orange)}
+.wrap{max-width:900px;margin:auto}
+header h1{margin:0;font-size:1.4rem;text-shadow:0 2px 4px #0003}
+header p{margin:6px 0 0;font-size:.92rem}
+.back{display:inline-block;margin-bottom:8px;color:#fff;font-weight:800;text-decoration:none;background:#ffffff2e;padding:6px 12px;border-radius:10px}
+main{max-width:900px;margin:16px auto;padding:0 12px 36px;display:grid;gap:14px}
+.card{background:#fff;border:1px solid var(--line);border-left:8px solid var(--green2);border-radius:18px;padding:16px;box-shadow:0 4px 14px #ff6b2c1a}
+.card.c2{border-left-color:var(--orange)}.card.c3{border-left-color:var(--blue)}.card.c4{border-left-color:var(--red)}
+h2{font-size:1.1rem;margin:0 0 10px;color:var(--green)}
+label{display:block;font-weight:700;font-size:.92rem;margin:12px 0 5px}
+input,select,textarea{width:100%;font:inherit;border:2px solid #f3d99a;border-radius:11px;padding:10px 12px;background:#fffdf7;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px #ff6b2c33}
+textarea{min-height:110px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chk{display:flex;align-items:center;gap:8px;font-weight:650;margin:12px 0 0}
+.chk input{width:auto;flex:none}
+button{border:0;border-radius:11px;padding:11px 14px;font:inherit;font-weight:700;cursor:pointer}
+button:active{transform:scale(.97)}
+.primary{background:linear-gradient(135deg,var(--orange),var(--red));color:#fff}
+.secondary{background:#e1f6ea;color:var(--green);border:1px solid #9fdcb9}
+.buttons{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.small{font-size:.85rem;color:var(--muted)}
+.status{display:inline-block;margin-top:8px;padding:6px 10px;border-radius:999px;font-size:.85rem;font-weight:700}
+.ok{background:#e1f6ea;color:var(--green)}.warn{background:#fff0b8;color:#8a5a00}
+.notice{background:#fff0b8;border:1px solid #f0cf5a;padding:12px;border-radius:12px;font-size:.88rem;margin-top:12px}
+.privacy{background:#eef5ff;border:1px solid #b9d3f5;padding:12px;border-radius:12px;font-size:.88rem;margin-top:12px}
+.privacy ul{margin:6px 0 0;padding-left:18px}
+@media(max-width:560px){.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="back" href="index.html">← Atelier de scènes</a>
+  <h1>🎬 Générateur guidé</h1>
+  <p>Une description claire et verrouillée, un rendu au choix (manga noir et blanc ou anime), puis l'image ou la vidéo dans le service de ton choix.</p>
+</div></header>
+<main>
+  <section class="card">
+    <h2>1. Ma scène (description verrouillée)</h2>
+    <p class="small">Le texte vient de l'atelier de scènes. Plus il est précis, moins l'IA invente au hasard.</p>
+    <textarea id="base" style="min-height:190px" placeholder="Prépare d'abord ta scène dans l'atelier de scènes, ou écris ici une description : personnages, décor, action, cadrage."></textarea>
+    <div><span class="status warn" id="check">Description à vérifier</span></div>
+    <label for="avoid">Éléments à ne PAS ajouter</label>
+    <input id="avoid" value="texte parasite, logo, signature, personnages supplémentaires, mains déformées, personnage ou costume d'une œuvre existante">
+    <label class="chk"><input type="checkbox" id="lock" checked> Verrouiller : n'ajouter aucun élément non décrit</label>
+  </section>
+
+  <section class="card c2">
+    <h2>2. Rendu de l'image</h2>
+    <div class="row">
+      <div><label for="render">Rendu</label><select id="render">
+        <option value="shonen">Manga noir et blanc style shonen</option>
+        <option value="anime">Anime couleur</option>
+        <option value="keep">Garder le style choisi dans la scène</option>
+      </select></div>
+      <div><label for="ratio">Format</label><select id="ratio">
+        <option value="portrait 3:4 (case verticale)">Portrait 3:4 (case verticale)</option>
+        <option value="paysage 16:9 (case large)">Paysage 16:9 (case large)</option>
+        <option value="carré 1:1">Carré 1:1</option>
+      </select></div>
+    </div>
+  </section>
+
+  <section class="card c3">
+    <h2>3. Générer l'image</h2>
+    <textarea id="final" readonly style="min-height:200px;background:#f4fbff"></textarea>
+    <div class="buttons">
+      <button class="primary" id="copy">Copier le prompt</button>
+      <button class="secondary" id="meta">Copier et ouvrir Meta AI</button>
+      <button class="secondary" id="gpt">Copier et ouvrir ChatGPT</button>
+    </div>
+    <div class="notice">Cette page ne génère rien elle-même et ne consomme aucun crédit : elle copie le prompt et ouvre le service. Chaque service applique ses propres limites gratuites et conditions (à la date de nos vérifications, le 2 novembre 2026 : Meta ne publie pas de plafond officiel pour Meta AI, des utilisateurs en signalent environ 25 images par jour ; ChatGPT gratuit applique une limite hebdomadaire non publiée). Je n'ai pas pu confirmer la disponibilité de Meta AI dans chaque pays.</div>
+    <p class="small">Ensuite : enregistre l'image obtenue, puis importe-la comme référence dans NOUTALA ZONE pour la retoucher.</p>
+  </section>
+
+  <section class="card c4">
+    <h2>4. Vidéo (générateurs étrangers)</h2>
+    <p class="small">Description obligatoire : sans action, durée et mouvement de caméra, le prompt vidéo n'est pas fourni.</p>
+    <label for="vAction">Ce qui se passe, du début à la fin *</label>
+    <textarea id="vAction" placeholder="Ex. Début : les deux lutteurs se font face, la foule retient son souffle. Fin : le premier lance sa prise, la poussière se soulève."></textarea>
+    <div class="row">
+      <div><label for="vDur">Durée</label><select id="vDur"><option>5 secondes</option><option>10 secondes</option></select></div>
+      <div><label for="vCam">Mouvement de caméra *</label><select id="vCam">
+        <option value="">— Choisir —</option>
+        <option>caméra fixe</option><option>travelling avant lent</option><option>travelling arrière</option>
+        <option>panoramique de gauche à droite</option><option>plongée qui descend vers les personnages</option>
+        <option>rotation autour des personnages</option><option>caméra qui suit le personnage en mouvement</option>
+      </select></div>
+    </div>
+    <label for="vKeep">À garder identique (personnages, tenues, décor)</label>
+    <input id="vKeep" value="mêmes visages, mêmes tenues, même décor que l'image de départ">
+    <label for="vSvc">Service</label>
+    <select id="vSvc">
+      <option value="kling">Kling AI (Chine, serveurs à Singapour)</option>
+      <option value="vidu">Vidu (Chine, serveurs à Singapour)</option>
+      <option value="wan">Wan 2.2 en local (open source, sur ton ordinateur)</option>
+    </select>
+    <div class="privacy" id="priv"></div>
+    <textarea id="vFinal" readonly style="min-height:170px;margin-top:12px;background:#f4fbff" placeholder="Le prompt vidéo apparaît quand la description est complète."></textarea>
+    <div class="buttons"><button class="primary" id="vCopy">Copier le prompt vidéo</button><button class="secondary" id="vOpen">Copier et ouvrir le service</button></div>
+  </section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+try{$('base').value=localStorage.getItem('afribd_last_prompt')||''}catch(e){}
+(function(){let src='logo.png';try{src=localStorage.getItem('afribd_studio_logo_v1')||src}catch(e){}$('favicon').href=src})();
+
+const SERVICES={
+ kling:{url:'https://kling.ai',nom:'Kling AI',points:[
+  'Données stockées sur des serveurs à Singapour, avec des transferts possibles hors de ton pays.',
+  'La politique (version du 21/04/2026) ne parle pas d\'entraînement des modèles sur tes contenus et ne propose pas d\'option de refus.',
+  'Les contenus peuvent être analysés et relus pour la modération ; aucune durée de conservation fixe.',
+  'Aucune clause spécifique garantissant la confidentialité des vidéos générées. Suppression du compte possible.']},
+ vidu:{url:'https://www.vidu.com',nom:'Vidu',points:[
+  'Données stockées à Singapour, transferts internationaux possibles vers des pays moins protecteurs.',
+  'Les contenus servent à « améliorer les services » ; pas d\'option de refus sur ce point.',
+  'Les contenus rendus publics peuvent être réutilisés sans ton accord ; promesse de « efforts raisonnables » de sécurité, sans garantie.',
+  'Suppression possible sur demande (support@vidu.com).']},
+ wan:{url:'https://github.com/Wan-Video/Wan2.2',nom:'Wan 2.2 (local)',points:[
+  'Modèle ouvert sous licence Apache 2.0 : il tourne sur ton propre ordinateur, donc aucune donnée ne quitte ta machine. C\'est la seule option réellement confidentielle.',
+  'Demande une carte graphique puissante (environ 8 Go de mémoire vidéo pour les petits modèles, 24 Go pour la version 5B). Impossible sur un téléphone Android.',
+  'Pas de service web gratuit officiel : il faut l\'installer toi-même ou passer par un service payant (alors, la confidentialité dépend de ce service).']}
+};
+function renderPriv(){
+ const s=SERVICES[$('vSvc').value];
+ $('priv').innerHTML='<b>Confidentialité — '+s.nom+'</b> (selon leurs textes publics lus le 2 novembre 2026)';
+ const ul=document.createElement('ul');s.points.forEach(p=>{const li=document.createElement('li');li.textContent=p;ul.appendChild(li)});
+ $('priv').appendChild(ul);
+ const n=document.createElement('p');n.className='small';
+ n.textContent='Aucun service hébergé ne garantit une confidentialité totale. Pour une œuvre non publiée ou sensible, n\'envoie qu\'une scène isolée, ou utilise la version locale.';
+ $('priv').appendChild(n);
+}
+
+function checkBase(){
+ const t=$('base').value,issues=[];
+ if(t.trim().length<150)issues.push('description trop courte');
+ if(/\[décrire|\[décor|\[décrire le personnage/.test(t))issues.push('un champ entre crochets n\'est pas rempli');
+ if(!/ACTION :/.test(t))issues.push('action manquante');
+ if(!/PERSONNAGE/.test(t))issues.push('personnage manquant');
+ const el=$('check');
+ if(issues.length){el.className='status warn';el.textContent='⚠️ À compléter : '+issues.join(', ')}
+ else{el.className='status ok';el.textContent='✅ Description suffisante'}
+ return issues.length===0;
+}
+function styleLine(){
+ const r=$('render').value;
+ if(r==='shonen')return 'STYLE : manga noir et blanc de style shonen : encre dense, trames (screentones), aplats noirs, lignes de vitesse, contrastes forts, aucune couleur, cases de manga professionnelles.';
+ if(r==='anime')return 'STYLE : anime en couleur : aplats nets, ombrage de dessin animé, couleurs vives et lumineuses, yeux expressifs, mouvement dynamique.';
+ return null;
+}
+function buildFinal(){
+ let t=$('base').value.trim();
+ if(!t){$('final').value='';return}
+ const sl=styleLine();
+ if(sl){if(/^STYLE :.*$/m.test(t))t=t.replace(/^STYLE :.*$/m,sl);else t+='\n'+sl}
+ if($('render').value==='shonen')t=t.replace('couleurs maîtrisées','tons de gris et noirs maîtrisés');
+ t+='\nFORMAT : '+$('ratio').value+'.';
+ const av=$('avoid').value.trim();
+ if(av)t+='\nNE PAS AJOUTER : '+av+'.';
+ if($('lock').checked)t+='\nVERROUILLAGE : représenter uniquement ce qui est décrit ci-dessus ; n\'ajouter aucun personnage, objet, texte ou élément non mentionné ; si une information manque, choisir l\'option la plus simple et neutre.';
+ $('final').value=t;
+}
+function videoPrompt(){
+ const act=$('vAction').value.trim();
+ if(act.length<30||!$('vCam').value||!$('base').value.trim())return '';
+ const keep=$('base').value.split('\n').filter(l=>/^(CULTURE ET PAYS|PERSONNAGE \d|DÉCOR|SYSTÈME DE POUVOIRS|ARME|CERCLE MAGIQUE|COMBAT) :/.test(l)).join('\n');
+ const r=$('render').value;
+ const rl=r==='shonen'?'RENDU : manga animé en noir et blanc, encre, trames, lignes de vitesse.':r==='anime'?'RENDU : anime en couleur, aplats nets, couleurs vives.':'';
+ return 'VIDÉO COURTE DE '+$('vDur').value+', format '+$('ratio').value+'.\n'+(keep?keep+'\n':'')+'ACTION DE LA VIDÉO (début → fin) : '+act+'\nCAMÉRA : '+$('vCam').value+'.\nÀ GARDER IDENTIQUE : '+($('vKeep').value.trim()||'mêmes personnages et décor')+'.\n'+(rl?rl+'\n':'')+'NE PAS AJOUTER : texte, logo, personnages supplémentaires, éléments non décrits. Mouvements fluides et crédibles, sans déformation des visages ni des mains. Pas de sang, public jeune.';
+}
+function refresh(){checkBase();buildFinal();$('vFinal').value=videoPrompt();}
+['base','avoid','lock','render','ratio','vAction','vDur','vCam','vKeep'].forEach(id=>{$(id).addEventListener('input',refresh);$(id).addEventListener('change',refresh)});
+$('vSvc').onchange=renderPriv;
+
+async function copy(t){
+ try{await navigator.clipboard.writeText(t);return true}catch(e){
+  const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();
+  let ok=false;try{ok=document.execCommand('copy')}catch(err){}
+  ta.remove();return ok;
+ }
+}
+async function copyThen(text,url){
+ if(!text){alert('Complète d\'abord la description.');return}
+ const ok=await copy(text);
+ alert(ok?'Prompt copié. Colle-le dans le service qui va s\'ouvrir.':'Copie impossible : sélectionne le texte manuellement.');
+ if(url)window.open(url,'_blank','noopener');
+}
+$('copy').onclick=()=>{if(!checkBase()&&!confirm('La description est incomplète : continuer quand même ?'))return;copyThen($('final').value,null)};
+$('meta').onclick=()=>{if(!checkBase()&&!confirm('La description est incomplète : continuer quand même ?'))return;copyThen($('final').value,'https://www.meta.ai')};
+$('gpt').onclick=()=>{if(!checkBase()&&!confirm('La description est incomplète : continuer quand même ?'))return;copyThen($('final').value,'https://chatgpt.com')};
+function needVideo(){
+ const v=videoPrompt();
+ if(!v){alert('Pour la vidéo, remplis : la scène (étape 1), l\'action du début à la fin (30 caractères minimum) et le mouvement de caméra.');return null}
+ return v;
+}
+$('vCopy').onclick=()=>{const v=needVideo();if(v)copyThen(v,null)};
+$('vOpen').onclick=()=>{const v=needVideo();if(v)copyThen(v,SERVICES[$('vSvc').value].url)};
+renderPriv();refresh();
+</script>
+</body>
+</html>

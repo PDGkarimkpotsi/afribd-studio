@@ -3,67 +3,200 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#173d32">
+<meta name="theme-color" content="#0b7a4b">
 <title>AfriBD Studio — Atelier de scènes</title>
+<link rel="icon" id="favicon" href="logo.png">
 <style>
-:root{--green:#173d32;--gold:#e8b85b;--paper:#fffaf0;--ink:#202a25;--muted:#68736c;--line:#dce4dc;--card:#fff}
+:root{
+  --green:#0b7a4b;--green2:#13b36b;--gold:#ffc21a;--orange:#ff6b2c;--red:#e0312b;--blue:#1e88e5;
+  --ink:#1f2a24;--muted:#5d6b63;--line:#f0dcae;--card:#fff;--bg:#fff4dc
+}
 *{box-sizing:border-box}
-body{margin:0;background:#f1f4ef;color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-header{background:var(--green);color:white;padding:22px 16px 20px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:linear-gradient(120deg,var(--green) 0%,var(--green2) 55%,var(--gold) 130%);color:white;padding:22px 16px 20px;border-bottom:6px solid var(--orange)}
 .wrap{max-width:900px;margin:auto}
-.brand{display:flex;align-items:center;gap:12px}
-.logo{width:48px;height:48px;border-radius:14px;background:var(--gold);color:var(--green);display:grid;place-items:center;font-size:25px;font-weight:900}
-h1{font-size:1.45rem;line-height:1.15;margin:0}
-header p{margin:8px 0 0;color:#e2eee7;font-size:.94rem}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:68px;height:68px;flex:none;border-radius:50%;background:#fff;border:3px solid var(--gold);box-shadow:0 3px 10px #0004;overflow:hidden;display:grid;place-items:center;color:var(--green);font-size:30px;font-weight:900}
+.logo img{width:100%;height:100%;object-fit:contain;padding:4px;display:none}
+h1{font-size:1.5rem;line-height:1.15;margin:0;text-shadow:0 2px 4px #0003}
+.tagline{color:#fff3c4;font-weight:700}
+header p{margin:10px 0 0;color:#ffffff;font-size:.95rem}
+.logoTools{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+.zoneLink{display:inline-flex;align-items:center;padding:7px 14px;border-radius:11px;font-size:.88rem;font-weight:800;background:var(--gold);color:#17251f;text-decoration:none;box-shadow:0 3px 8px #0003}
+.logoTools button{padding:7px 12px;font-size:.82rem;background:#ffffff26;color:#fff;border:1px solid #ffffff80}
 main{max-width:900px;margin:16px auto;padding:0 12px 36px;display:grid;gap:14px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 3px 12px #173d3209}
-h2{font-size:1.08rem;margin:0 0 12px}
-label{display:block;font-weight:650;font-size:.92rem;margin:12px 0 5px}
-input,select,textarea{width:100%;font:inherit;border:1px solid #cbd6cc;border-radius:11px;padding:11px 12px;background:white;color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-left:8px solid var(--green2);border-radius:18px;padding:16px;box-shadow:0 4px 14px #ff6b2c1a}
+.card:nth-of-type(2){border-left-color:var(--orange)}
+.card:nth-of-type(3){border-left-color:var(--blue)}
+.card:nth-of-type(4){border-left-color:var(--gold)}
+.card:nth-of-type(5){border-left-color:var(--red)}
+h2{font-size:1.1rem;margin:0 0 12px;color:var(--green)}
+label{display:block;font-weight:700;font-size:.92rem;margin:12px 0 5px}
+input,select,textarea{width:100%;font:inherit;border:2px solid #f3d99a;border-radius:11px;padding:11px 12px;background:#fffdf7;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px #ff6b2c33}
 textarea{min-height:96px;resize:vertical}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-button{border:0;border-radius:11px;padding:11px 14px;font:inherit;font-weight:700;cursor:pointer}
-.primary{background:var(--green);color:white}
-.secondary{background:#e8eee8;color:var(--green)}
-.danger{background:#fff0ec;color:#8b2c1c}
+.chk{display:flex;align-items:center;gap:8px;font-weight:650;margin:12px 0 0}
+.chk input{width:auto;flex:none}
+button{border:0;border-radius:11px;padding:11px 14px;font:inherit;font-weight:700;cursor:pointer;transition:transform .1s}
+button:active{transform:scale(.97)}
+.primary{background:linear-gradient(135deg,var(--orange),var(--red));color:white;box-shadow:0 3px 8px #e0312b44}
+.secondary{background:#e1f6ea;color:var(--green);border:1px solid #9fdcb9}
+.danger{background:#ffe6e1;color:#b3261a;border:1px solid #f5a99f}
 .buttons{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .small{font-size:.85rem;color:var(--muted)}
-#prompt{min-height:190px;background:#fbfcf9}
-.scene{border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:10px}
-.scene h3{margin:0 0 5px;font-size:1rem}
+#prompt{min-height:190px;background:#f4fbff}
+.scene{border:2px solid var(--line);border-radius:13px;padding:12px;margin-top:10px;background:#fffaf0}
+.scene h3{margin:0 0 5px;font-size:1rem;color:var(--orange)}
 .scene p{margin:4px 0;overflow-wrap:anywhere}
 .scene .buttons{margin-top:9px}
-.notice{background:#fff7df;border:1px solid #efdc9e;padding:12px;border-radius:12px;font-size:.9rem}
+.notice{background:#fff0b8;border:1px solid #f0cf5a;padding:12px;border-radius:12px;font-size:.9rem}
+.info{background:#e8f8ef;border:1px solid #9fdcb9;padding:10px 12px;border-radius:12px;font-size:.88rem;margin-top:12px}
+details.creator{margin-top:14px;border:2px dashed #f0b78d;border-radius:14px;padding:10px 12px;background:#fff8f0}
+details.creator summary{font-weight:800;cursor:pointer;color:var(--orange)}
+.myChar{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);border-radius:11px;padding:8px 10px;margin-top:8px;background:#fff}
+.myChar span{font-size:.9rem;overflow-wrap:anywhere}
+.myChar button{padding:7px 10px;font-size:.8rem;flex:none}
+.combatBox{margin-top:14px;border:2px solid #f5a99f;border-radius:14px;padding:4px 12px 12px;background:#fff6f4}
+.combatBox h3{margin:12px 0 0;color:var(--red);font-size:1rem}
+.fantBox{margin-top:14px;border:2px solid #b9a3ec;border-radius:14px;padding:4px 12px 12px;background:#f7f3ff}
+.fantBox h3{margin:12px 0 0;color:#6a3fc9;font-size:1rem}
+.sugg{margin-top:12px;border:2px solid #b9a3ec;border-radius:12px;padding:10px 12px;background:#f7f3ff;font-size:.88rem}
+.sugg button{margin-top:8px;background:#6a3fc9;color:#fff}
 footer{text-align:center;color:var(--muted);font-size:.82rem;padding:8px 16px 26px}
-@media(max-width:560px){.row{grid-template-columns:1fr}header{padding:18px 14px}main{padding:0 10px 28px}.card{padding:14px}}
+[hidden]{display:none!important}
+body.lite *{box-shadow:none!important;transition:none!important;animation:none!important;text-shadow:none!important}
+body.lite header{background:var(--green)}
+body.lite .primary{background:var(--orange)}
+@media(max-width:560px){.row{grid-template-columns:1fr}header{padding:18px 14px}main{padding:0 10px 28px}.card{padding:14px}.logo{width:58px;height:58px}}
 </style>
 </head>
 <body>
 <header><div class="wrap">
-  <div class="brand"><div class="logo">A</div><div><h1>AfriBD Studio</h1><div style="color:#f3dca8;font-weight:650">Atelier de scènes · Prototype 0.1</div></div></div>
-  <p>Imaginez une scène, préparez sa description visuelle et organisez vos idées de bande dessinée.</p>
+  <div class="brand">
+    <div class="logo"><span id="logoLetter">A</span><img id="logoImg" alt="Logo AfriBD Studio"></div>
+    <div><h1>AfriBD Studio</h1><div class="tagline">Atelier de scènes · Prototype 0.5</div></div>
+  </div>
+  <p>Imaginez une scène, préparez sa description visuelle et organisez vos idées de bande dessinée, avec des personnages et des décors qui vous ressemblent.</p>
+  <div class="logoTools">
+    <a class="zoneLink" href="noutala.html">🎨 NOUTALA ZONE · Atelier de dessin</a>
+    <a class="zoneLink" href="generateur.html">🎬 Générateur guidé</a>
+    <a class="zoneLink" href="voix.html">🎙️ Studio de voix</a>
+    <button id="logoChange">Changer le logo</button>
+    <button id="logoReset">Logo par défaut</button>
+    <input type="file" id="logoFile" accept="image/*" hidden>
+  </div>
 </div></header>
 <main>
   <section class="card">
-    <h2>1. Construire une scène</h2>
+    <h2>1. Mon pays et ma culture</h2>
+    <p class="small">Choisis ton pays : les prénoms, les tenues, les décors et les traditions de combat s'adaptent pour que ta BD reflète ta culture. Tu pourras ensuite tout modifier en création libre.</p>
+    <label for="country">Pays</label>
+    <select id="country"></select>
+    <div id="otherBox" hidden>
+      <label for="otherCountry">Nom du pays ou de la région</label>
+      <input id="otherCountry" placeholder="Ex. Niger, Gabon, Madagascar, Maroc…">
+      <label for="otherCulture">Tenues, décors, traditions, ruines, forêts sacrées à respecter (facultatif)</label>
+      <textarea id="otherCulture" style="min-height:68px" placeholder="Ex. boubou bleu brodé, maisons en terre ocre, ruines d’un ancien palais, forêt sacrée du village…"></textarea>
+    </div>
+    <div class="info" id="countryInfo"></div>
+  </section>
+
+  <section class="card">
+    <h2>2. Personnages</h2>
+    <p class="small">Des personnages de tous les âges, garçons, filles, hommes et femmes, sont proposés pour ton pays. Tu peux aussi décrire ou créer le tien.</p>
     <div class="row">
-      <div><label for="character">Personnage</label><select id="character">
-        <option value="Kossi, adolescent ouest-africain, peau brune, cheveux courts noirs, t-shirt jaune, pantalon bleu et sandales">Kossi — adolescent en jaune</option>
-        <option value="Ama, jeune femme ouest-africaine, peau brune, tresses noires, robe colorée et petites boucles d'oreilles">Ama — jeune femme aux tresses</option>
-        <option value="Yao, jeune adulte ouest-africain, peau brune, chemise verte, pantalon sombre et sac en bandoulière">Yao — jeune adulte en vert</option>
-        <option value="personnage original à définir selon la description de l'auteur">Personnage personnalisé</option>
-      </select></div>
-      <div><label for="setting">Décor</label><select id="setting">
-        <option>Rue d'un quartier populaire de Lomé, Togo</option>
-        <option>Marché animé d'Afrique de l'Ouest</option>
-        <option>Cour familiale avec murs en parpaings</option>
-        <option>Terrain de football de quartier en terre rouge</option>
-        <option>Petite boutique de quartier avec étagères et boissons</option>
-        <option>Arrêt de taxi-moto au bord d'une rue poussiéreuse</option>
-        <option>École de quartier en journée</option>
-        <option>Décor personnalisé décrit par l'auteur</option>
+      <div><label for="char1">Personnage 1</label><select id="char1"></select>
+        <textarea id="free1" hidden style="margin-top:8px;min-height:80px" placeholder="Décris-le : âge, teint, coiffure, tenue, caractère…"></textarea></div>
+      <div><label for="char2">Personnage 2 (facultatif)</label><select id="char2"></select>
+        <textarea id="free2" hidden style="margin-top:8px;min-height:80px" placeholder="Décris-le : âge, teint, coiffure, tenue, caractère…"></textarea></div>
+    </div>
+
+    <div class="sugg" id="sugg" hidden></div>
+
+    <details class="creator" id="creator">
+      <summary>✍️ Création libre : créer mon propre personnage</summary>
+      <div class="row">
+        <div><label for="cName">Nom</label><input id="cName" maxlength="40" placeholder="Ex. Kossivi"></div>
+        <div><label for="cAge">Âge</label><input id="cAge" type="number" min="1" max="110" value="20"></div>
+      </div>
+      <div class="row">
+        <div><label for="cSex">Sexe</label><select id="cSex"><option value="f">Féminin</option><option value="m">Masculin</option></select></div>
+        <div><label for="cSkin">Teint de peau</label><select id="cSkin"></select></div>
+      </div>
+      <div class="row">
+        <div><label for="cHair">Coiffure</label><select id="cHair"></select></div>
+        <div><label for="cOutfit">Tenue</label><select id="cOutfit"></select></div>
+      </div>
+      <label for="cAcc">Accessoires (facultatif)</label>
+      <input id="cAcc" placeholder="Ex. lunettes rondes, sac en bandoulière, bijoux en perles">
+      <label for="cTrait">Caractère ou détails (facultatif)</label>
+      <input id="cTrait" placeholder="Ex. timide mais courageux, cicatrice au menton, sourire éclatant">
+      <div class="buttons"><button class="primary" id="cSave">Enregistrer ce personnage</button></div>
+      <div id="myChars"></div>
+    </details>
+  </section>
+
+  <section class="card">
+    <h2>3. Construire la scène</h2>
+    <div class="row">
+      <div><label for="setting">Décor</label><select id="setting"></select></div>
+      <div><label for="sceneType">Type de scène</label><select id="sceneType">
+        <option value="normal">Scène de vie, de dialogue ou d'aventure</option>
+        <option value="combat">⚔️ Scène de combat</option>
+        <option value="fantasy">✨ Combat fantastique / héroïque (pouvoirs, magie)</option>
       </select></div>
     </div>
+
+    <div id="decorLibreBox" hidden>
+      <label for="decorLibre">Mon décor culturel</label>
+      <textarea id="decorLibre" style="min-height:68px" placeholder="Décris le lieu : architecture, végétation, couleurs, objets, ambiance, éléments propres à ta culture…"></textarea>
+    </div>
+
+    <div class="combatBox" id="combatBox" hidden>
+      <h3>⚔️ Réglages du combat</h3>
+      <div class="row">
+        <div id="combatTypeWrap"><label for="combatType">Style de combat</label><select id="combatType"></select></div>
+        <div><label for="combatLevel">Intensité</label><select id="combatLevel">
+          <option>Amicale et sportive, entre amis ou rivaux respectueux</option>
+          <option>Tendue, avec de la colère mais sans gravité</option>
+          <option>Épique et spectaculaire, comme dans un grand récit</option>
+        </select></div>
+      </div>
+      <div class="row">
+        <div><label for="combatMoment">Moment du combat</label><select id="combatMoment">
+          <option>Face-à-face avant le combat, la tension monte</option>
+          <option>En plein combat, action maximale</option>
+          <option>Le coup décisif</option>
+          <option>Après le combat, le calme revient</option>
+        </select></div>
+        <div></div>
+      </div>
+      <label class="chk"><input type="checkbox" id="fx" checked> Lignes de vitesse, poussière et effets de mouvement</label>
+      <label class="chk"><input type="checkbox" id="noGore" checked> Pas de sang ni de blessures graves (BD tout public)</label>
+    </div>
+
+    <div class="fantBox" id="fantBox" hidden>
+      <h3>✨ Pouvoirs et magie (fantastique / héroïque)</h3>
+      <p class="small">Inspiré des grands récits d'action et de magie, mais avec des techniques originales et des motifs de ta culture. Choisis un héros fantastique à l'étape 2 pour recevoir des suggestions.</p>
+      <div class="row">
+        <div><label for="fVoie">Voie de pouvoir</label><select id="fVoie"></select></div>
+        <div><label for="fElem">Élément dominant</label><select id="fElem"></select></div>
+      </div>
+      <div class="row">
+        <div><label for="fArme">Arme</label><select id="fArme"></select></div>
+        <div><label for="fCoul">Couleur de l'énergie</label><select id="fCoul"></select></div>
+      </div>
+      <div class="row">
+        <div><label for="fCercle">Cercle magique</label><select id="fCercle"></select></div>
+        <div><label for="fMotif">Motifs du cercle</label><select id="fMotif"></select></div>
+      </div>
+      <div class="row">
+        <div><label for="fPuis">Niveau de puissance</label><select id="fPuis"></select></div>
+        <div></div>
+      </div>
+    </div>
+
     <div class="row">
       <div><label for="pose">Cadrage / pose</label><select id="pose">
         <option>Plan moyen, personnages visibles de la taille à la tête</option>
@@ -71,13 +204,18 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:8px 16px 26
         <option>Gros plan sur le visage et l'émotion</option>
         <option>Vue par-dessus l'épaule pendant une conversation</option>
         <option>Plan dynamique d'une course ou d'une dispute</option>
+        <option>Face-à-face tendu entre deux personnages</option>
+        <option>Contre-plongée qui donne de la puissance aux personnages</option>
       </select></div>
       <div><label for="style">Style graphique</label><select id="style">
+        <option>Manga noir et blanc style shonen : encre dense, trames, lignes de vitesse, contrastes forts</option>
+        <option>Anime couleur : aplats nets, ombrage de dessin animé, couleurs vives, yeux expressifs</option>
         <option>BD africaine semi-réaliste, encrage propre et couleurs chaudes</option>
         <option>Manga africain original, expressions marquées et lignes dynamiques</option>
         <option>Dessin animé coloré, formes lisibles et ambiance chaleureuse</option>
         <option>Roman graphique à l'encre, ombres travaillées et textures</option>
         <option>BD jeunesse, dessin simple et couleurs franches</option>
+        <option>Dessin au trait noir et blanc pour BD imprimée</option>
       </select></div>
     </div>
     <label for="action">Que se passe-t-il dans la scène ?</label>
@@ -90,62 +228,548 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;padding:8px 16px 26
   </section>
 
   <section class="card">
-    <h2>2. Prompt prêt à copier</h2>
+    <h2>4. Prompt prêt à copier</h2>
     <p class="small">Copiez ce texte dans un générateur d'images. Pour garder un personnage cohérent, ajoutez sa fiche de référence ou une image existante si l'outil l'accepte.</p>
     <textarea id="prompt" placeholder="Votre prompt apparaîtra ici…" readonly></textarea>
-    <div class="buttons"><button class="primary" id="copy">Copier le prompt</button><button class="secondary" id="downloadPrompt">Télécharger le prompt .txt</button><button class="secondary" id="openImage">Ouvrir un générateur d'images</button></div>
-    <div class="notice" style="margin-top:12px">Le bouton « Ouvrir » propose un service externe. Ses crédits, conditions et résultats dépendent de ce service. AfriBD Studio ne génère pas encore les images directement.</div>
+    <div class="buttons"><button class="primary" id="copy">Copier le prompt</button><button class="secondary" id="downloadPrompt">Télécharger le prompt .txt</button><button class="secondary" id="openImage">🎬 Générateur guidé (image et vidéo)</button><button class="secondary" id="openVoice">🎙️ Lire le dialogue (studio de voix)</button></div>
+    <div class="notice" style="margin-top:12px">Le générateur guidé copie ton prompt et ouvre des services externes (Meta AI, ChatGPT, générateurs vidéo). Leurs limites, conditions et résultats dépendent de ces services : AfriBD Studio ne génère pas lui-même les images.</div>
   </section>
 
   <section class="card">
-    <h2>3. Mon carnet de scènes</h2>
-    <p class="small">Les scènes sont conservées dans le stockage local de ce navigateur sur ce téléphone. Elles ne sont pas encore synchronisées avec vos amis. Exportez une sauvegarde pour ne pas les perdre.</p>
+    <h2>5. Mon carnet de scènes</h2>
+    <p class="small">Les scènes et tes personnages sont conservés dans le stockage local de ce navigateur sur ce téléphone. Ils ne sont pas encore synchronisés avec vos amis. Exportez une sauvegarde pour ne pas les perdre.</p>
     <div class="buttons"><button class="primary" id="save">Enregistrer cette scène</button><button class="secondary" id="export">Exporter le carnet (.json)</button><button class="secondary" id="importButton">Importer un carnet</button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
     <div id="scenes"><p class="small">Aucune scène enregistrée pour le moment.</p></div>
   </section>
   <section class="card">
-    <h2>4. Étapes suivantes</h2>
+    <h2>6. Sauvegarde cloud et abonnement (à venir)</h2>
+    <label class="chk" style="margin-top:0"><input type="checkbox" id="liteMode"> Mode léger (conseillé pour les téléphones Android peu puissants)</label>
+    <p class="small" id="liteHint"></p>
+    <div class="info">
+      <b>☁️ Sauvegarde cloud automatique, au choix du créateur</b>
+      <label class="chk"><input type="checkbox" id="cloudOn" disabled> Activer la sauvegarde cloud automatique</label>
+      <div class="small" style="margin-top:6px">Pas encore disponible : aucune donnée n'est envoyée en ligne. En attendant, ton travail est sauvegardé sur ce téléphone et tu peux l'exporter gratuitement (carnet .json, projets NOUTALA ZONE, PNG).</div>
+    </div>
+    <div class="notice" style="margin-top:12px">
+      <b>Offre prévue : abonnement cloud à 12 000 FCFA par mois</b><br>
+      Paiement par Mobile Money, identifiant : <b>afribd-studio</b><br>
+      Avantage prévu : télécharger les œuvres sauvegardées dans le cloud. Les exports locaux restent gratuits.<br>
+      <span class="small">Statut : paiement non activé. N'effectue aucun paiement tant que cette page n'indique pas que le service est ouvert.</span>
+    </div>
+    <div class="buttons"><button class="primary" id="subBtn" disabled>Souscrire (bientôt disponible)</button></div>
+    <p class="small">Prérequis techniques : comptes utilisateurs, espace de stockage, et prestataire de paiement Mobile Money avec confirmation automatique des paiements.</p>
+  </section>
+  <section class="card">
+    <h2>7. Étapes suivantes</h2>
     <ul>
-      <li>Tester les prompts avec plusieurs générateurs d'images.</li>
+      <li>Ajouter d'autres pays, langues et traditions (ta contribution est la bienvenue).</li>
+      <li>Sauvegarde cloud avec comptes et abonnement (nécessite un serveur).</li>
       <li>Créer une fiche de référence illustrée pour chaque personnage principal.</li>
       <li>Partager les fichiers JSON entre les membres de l'équipe.</li>
       <li>Ajouter plus tard un compte utilisateur et une base de données collaborative.</li>
     </ul>
   </section>
 </main>
-<footer>AfriBD Studio · Prototype gratuit · Version 0.1</footer>
+<footer>AfriBD Studio · Prototype gratuit · Version 0.5</footer>
 <script>
 const $ = id => document.getElementById(id);
 const STORE = 'afribd_studio_scenes_v1';
-function makePrompt(){
-  const char=$('character').selectedOptions[0].text + ': ' + $('character').value;
-  const action=$('action').value.trim() || '[décrire précisément l’action des personnages]';
-  const dialogue=$('dialogue').value.trim();
-  const notes=$('notes').value.trim();
-  return `Créer UNE illustration de bande dessinée originale.\n\nPERSONNAGE : ${char}.\nDÉCOR : ${$('setting').value}.\nACTION : ${action}.\nCADRAGE ET POSE : ${$('pose').value}.\nSTYLE : ${$('style').value}.\n${dialogue ? 'DIALOGUE À INTÉGRER SI LE MODÈLE REND BIEN LE TEXTE :\n'+dialogue+'\n' : 'DIALOGUE : ne pas ajouter de texte ni de bulles non demandés.\n'}${notes ? 'DÉTAILS À RESPECTER : '+notes+'\n' : ''}\nCOHÉRENCE VISUELLE : respecter la même apparence, la même carnation, la coiffure, les vêtements et les accessoires du personnage décrits. Anatomie naturelle, mains lisibles, expressions crédibles, décor ouest-africain documenté et spécifique, composition claire, éclairage cohérent, contours nets, couleurs maîtrisées. Une seule scène, sans collage de plusieurs cases, sans logo, sans signature ni texte parasite.`;
+const CHARS = 'afribd_studio_chars_v1';
+const CKEY = 'afribd_studio_country_v1';
+const LOGO_KEY = 'afribd_studio_logo_v1';
+const DEFAULT_LOGO = 'logo.png';
+
+/* ---------- Logo ---------- */
+function showLogo(src){
+  const img=$('logoImg');
+  img.onload=()=>{img.style.display='block';$('logoLetter').style.display='none';$('favicon').href=src};
+  img.onerror=()=>{img.style.display='none';$('logoLetter').style.display='block'};
+  img.src=src;
 }
-function readScenes(){try{return JSON.parse(localStorage.getItem(STORE)||'[]')}catch(e){return []}}
+function initLogo(){
+  let saved=null;
+  try{saved=localStorage.getItem(LOGO_KEY)}catch(e){}
+  showLogo(saved||DEFAULT_LOGO);
+}
+function resizeToDataUrl(file,max,cb){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const im=new Image();
+    im.onload=()=>{
+      const r=Math.min(1,max/Math.max(im.width,im.height));
+      const c=document.createElement('canvas');
+      c.width=Math.round(im.width*r);c.height=Math.round(im.height*r);
+      c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+      cb(c.toDataURL('image/png'));
+    };
+    im.onerror=()=>alert('Image illisible. Choisissez un fichier PNG, JPG ou WebP.');
+    im.src=reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+$('logoChange').onclick=()=>$('logoFile').click();
+$('logoFile').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  resizeToDataUrl(f,256,url=>{
+    try{localStorage.setItem(LOGO_KEY,url)}catch(err){alert('Logo affiché, mais impossible de le mémoriser (stockage plein ou indisponible).')}
+    showLogo(url);
+  });
+  e.target.value='';
+};
+$('logoReset').onclick=()=>{try{localStorage.removeItem(LOGO_KEY)}catch(e){}showLogo(DEFAULT_LOGO)};
+
+/* ---------- Données culturelles ----------
+   Chaque pays : prénoms, tenues, décors et, quand elle existe, une tradition de combat.
+   Pour ajouter un pays, copier une entrée et l'ajouter aussi dans GROUPES. */
+const PAYS={
+ togo:{nom:'Togo',ville:'Lomé',
+  m:['Kossi','Komla','Yao','Edem','Koffi','Kodjo'],f:['Ama','Afi','Akouvi','Mawuena','Abla','Dzifa'],
+  tenue:{h:'chemise en tissu wax et pantalon',f:'ensemble kaba et pagne en tissu wax coloré',fete:'tenue de cérémonie en tissu kenté tissé aux couleurs vives, drapée avec élégance'},
+  decors:['Rue d’un quartier populaire de Lomé, Togo','Plage bordée de cocotiers près de Lomé','Marché animé de quartier à Lomé','Village du nord du Togo aux maisons de terre'],
+  combat:{nom:'Evala',desc:'lutte traditionnelle des jeunes Kabyè de la région de Kara, en tenue traditionnelle de lutteur, dans une arène de village devant la foule'}},
+ benin:{nom:'Bénin',ville:'Cotonou',
+  m:['Dossou','Codjo','Comlan','Sèdjro','Fiacre','Hounkpatin'],f:['Fifamè','Sènami','Afiavi','Houéfa','Gisèle','Rosine'],
+  tenue:{h:'chemise ou boubou en tissu wax',f:'ensemble pagne et haut en tissu wax',fete:'tenue de cérémonie en pagne wax brodé aux motifs élégants'},
+  decors:['Rue animée de Cotonou avec des zémidjans (taxis-motos)','Grand marché de Dantokpa, Cotonou','Village lacustre de Ganvié sur pilotis'],combat:null},
+ ghana:{nom:'Ghana',ville:'Accra',
+  m:['Kwame','Kofi','Kwesi','Yaw','Kojo','Kwabena'],f:['Ama','Akosua','Abena','Esi','Adwoa','Efua'],
+  tenue:{h:'chemise en tissu wax ou smock (fugu) et pantalon',f:'kaba et slit : haut ajusté et jupe longue en tissu wax',fete:'tenue de cérémonie en tissu kente tissé aux motifs géométriques colorés'},
+  decors:['Rue d’un quartier d’Accra avec des tro-tros (minibus)','Marché animé d’Accra','Plage de pêcheurs avec pirogues près d’Accra'],combat:null},
+ nigeria:{nom:'Nigéria',ville:'Lagos',
+  m:['Chinedu','Tunde','Emeka','Ibrahim','Segun','Yusuf'],f:['Ngozi','Amina','Funmi','Chioma','Aisha','Bisi'],
+  tenue:{h:'chemise ankara et pantalon',f:'robe ankara ou buba et iro',fete:'agbada brodé pour les hommes, ou buba et iro avec un gele (foulard de tête) élaboré pour les femmes'},
+  decors:['Rue animée de Lagos avec des danfos (minibus jaunes)','Marché animé du Nigéria','Ville du nord aux murs décorés de motifs haoussa'],
+  combat:{nom:'Dambe',desc:'boxe traditionnelle haoussa, poing enveloppé de bandelettes, devant un cercle de spectateurs'}},
+ senegal:{nom:'Sénégal',ville:'Dakar',
+  m:['Mamadou','Ousmane','Cheikh','Moussa','Ibrahima','Abdou'],f:['Aminata','Fatou','Awa','Khady','Mariama','Ndeye'],
+  tenue:{h:'boubou ou tunique brodée et pantalon',f:'boubou coloré avec foulard assorti',fete:'grand boubou brodé de cérémonie'},
+  decors:['Rue de Dakar avec des cars rapides colorés','Plage de pêcheurs avec pirogues colorées près de Dakar','Marché animé de Dakar'],
+  combat:{nom:'Laamb',desc:'lutte sénégalaise dans une grande arène, lutteurs en pagne et gris-gris, foule en liesse, tambours'}},
+ mali:{nom:'Mali',ville:'Bamako',
+  m:['Moussa','Seydou','Amadou','Modibo','Bakary','Sékou'],f:['Fanta','Awa','Aïssata','Mariam','Kadiatou','Oumou'],
+  tenue:{h:'boubou ou tunique en tissu bogolan',f:'boubou ou pagne avec foulard noué',fete:'bazin riche brodé ou tenue en bogolan (tissu teint à la boue)'},
+  decors:['Rue de Bamako au bord du fleuve Niger','Ville de Djenné et sa grande mosquée en terre','Marché animé de Bamako'],combat:null},
+ civ:{nom:'Côte d’Ivoire',ville:'Abidjan',
+  m:['Kouassi','Yao','Konan','Ibrahim','Serge','Adama'],f:['Akissi','Aya','Adjoua','Affoué','Fatou','Awa'],
+  tenue:{h:'chemise en tissu wax et pantalon',f:'ensemble pagne wax et haut ajusté',fete:'tenue de cérémonie en tissu tissé baoulé aux motifs colorés'},
+  decors:['Rue d’Abidjan avec des gbakas (minibus)','Bord de la lagune d’Abidjan','Marché animé d’Abidjan'],combat:null},
+ burkina:{nom:'Burkina Faso',ville:'Ouagadougou',
+  m:['Ousmane','Issouf','Boukary','Salif','Adama','Moumouni'],f:['Aminata','Fatimata','Awa','Salimata','Pascaline','Rasmata'],
+  tenue:{h:'tunique en Faso Dan Fani (coton tissé) et pantalon',f:'pagne et haut en Faso Dan Fani (coton tissé)',fete:'tenue de cérémonie en Faso Dan Fani aux motifs tissés'},
+  decors:['Rue de Ouagadougou avec de nombreuses mobylettes','Cour traditionnelle aux murs peints de motifs géométriques (style Tiébélé)','Marché animé de Ouagadougou'],combat:null},
+ cameroun:{nom:'Cameroun',ville:'Douala',
+  m:['Mballa','Etienne','Brice','Hervé','Fotso','Armel'],f:['Mireille','Nadège','Ngono','Estelle','Aïcha','Prisca'],
+  tenue:{h:'chemise en tissu wax et pantalon',f:'kaba (robe ample en tissu wax)',fete:'toghu, tenue de cérémonie brodée des hauts plateaux de l’Ouest'},
+  decors:['Rue animée de Douala','Marché animé de Yaoundé','Village des hauts plateaux de l’Ouest'],combat:null},
+ rdc:{nom:'RD Congo',ville:'Kinshasa',
+  m:['Trésor','Blaise','Patrick','Serge','Junior','Mbuyi'],f:['Grâce','Patience','Espérance','Chantal','Mado','Nzuzi'],
+  tenue:{h:'costume élégant coloré à la manière des sapeurs (la SAPE)',f:'liputa : pagne drapé coloré avec haut assorti',fete:'liputa de fête avec foulard de tête élaboré'},
+  decors:['Rue animée de Kinshasa','Bord du fleuve Congo avec pirogues','Marché animé de Kinshasa'],combat:null},
+ kenya:{nom:'Kenya',ville:'Nairobi',
+  m:['Kamau','Otieno','Mwangi','Juma','Kiprop','Baraka'],f:['Wanjiru','Akinyi','Njeri','Amina','Chebet','Zawadi'],
+  tenue:{h:'chemise et kikoi ou pantalon',f:'robe en kitenge ou kanga (tissu imprimé swahili)',fete:'shuka (étoffe à carreaux) et bijoux perlés colorés'},
+  decors:['Rue de Nairobi avec des matatus (minibus colorés)','Savane avec acacias, au lever du soleil','Plage de Mombasa avec palmiers'],combat:null},
+ ethiopie:{nom:'Éthiopie',ville:'Addis-Abeba',
+  m:['Abebe','Dawit','Tesfaye','Yonas','Kebede','Henok'],f:['Selam','Tigist','Meron','Hana','Almaz','Bethlehem'],
+  tenue:{h:'chemise et pantalon, ou tenue blanche traditionnelle',f:'robe moderne ou habesha kemis (robe blanche brodée) avec netela',fete:'habesha kemis brodée de fête'},
+  decors:['Rue d’Addis-Abeba','Grand marché Mercato d’Addis-Abeba','Café traditionnel avec cérémonie du café'],combat:null},
+ afsud:{nom:'Afrique du Sud',ville:'Johannesburg',
+  m:['Sipho','Thabo','Themba','Lwazi','Bongani','Sizwe'],f:['Nomsa','Thandi','Lerato','Zanele','Naledi','Palesa'],
+  tenue:{h:'tenue contemporaine, chemise et pantalon',f:'robe en tissu shweshwe',fete:'tenue traditionnelle perlée de cérémonie'},
+  decors:['Quartier animé de township avec des maisons colorées','Marché animé de Johannesburg','Paysage de collines verdoyantes avec village'],
+  combat:{nom:'Stick fighting nguni',desc:'combat au bâton traditionnel des jeunes bergers, bâtons de bois, tenue traditionnelle, devant la communauté'}},
+ afrique:{nom:'Afrique',label:'Afrique (général)',ville:'une grande ville africaine',
+  m:['Kofi','Amadou','Tunde','Baraka','Sipho','Moussa'],f:['Ama','Aïcha','Zuri','Nia','Fatou','Thandi'],
+  tenue:{h:'chemise en tissu wax et pantalon',f:'robe ou ensemble en tissu wax coloré',fete:'tenue de cérémonie traditionnelle aux motifs africains'},
+  decors:['Rue animée d’un quartier populaire africain'],combat:null},
+ autre:{nom:'Afrique',label:'Autre pays (je précise)',ville:'une ville de ce pays',
+  m:['Kofi','Amadou','Tunde','Baraka','Sipho','Moussa'],f:['Ama','Aïcha','Zuri','Nia','Fatou','Thandi'],
+  tenue:{h:'chemise et pantalon',f:'robe ou ensemble coloré',fete:'tenue de cérémonie traditionnelle du pays'},
+  decors:[],combat:null}
+};
+const GROUPES=[
+ ['Afrique de l’Ouest',['togo','benin','ghana','nigeria','senegal','mali','civ','burkina']],
+ ['Afrique centrale',['cameroun','rdc']],
+ ['Afrique de l’Est',['kenya','ethiopie']],
+ ['Afrique australe',['afsud']],
+ ['Autres',['afrique','autre']]
+];
+const DECORS_COMMUNS=['Marché animé de quartier','Cour familiale avec murs en parpaings','Terrain de football de quartier en terre rouge','Petite boutique de quartier avec étagères et boissons','Arrêt de taxi-moto au bord d’une rue poussiéreuse','École de quartier en journée','Village avec cases et grand arbre à palabres','Bord de fleuve avec pirogues','Atelier de couture ou de menuiserie','Place de village aménagée en arène pour un combat'];
+const ARCH=[
+ {id:'gar',lab:'garçon',age:8,s:'m',coif:'cheveux ras très courts',role:'écolier curieux et espiègle',tn:'h'},
+ {id:'fil',lab:'fille',age:8,s:'f',coif:'petites nattes avec élastiques colorés',role:'écolière vive et souriante',tn:'f'},
+ {id:'ado',lab:'adolescent',age:15,s:'m',coif:'cheveux courts, coupe dégradée',role:'lycéen sportif',tn:'h'},
+ {id:'adf',lab:'adolescente',age:15,s:'f',coif:'tresses collées',role:'lycéenne brillante',tn:'f'},
+ {id:'jhm',lab:'jeune homme',age:24,s:'m',coif:'cheveux courts soignés',role:'étudiant ou apprenti débrouillard',tn:'h'},
+ {id:'jfm',lab:'jeune femme',age:24,s:'f',coif:'tresses longues ou foulard noué',role:'entrepreneure dynamique',tn:'f'},
+ {id:'pere',lab:'père de famille',age:42,s:'m',coif:'cheveux courts, barbe courte',role:'artisan ou commerçant respecté',tn:'h'},
+ {id:'mere',lab:'mère de famille',age:40,s:'f',coif:'coiffure tressée ou foulard élégant',role:'commerçante du marché, pilier de la famille',tn:'f'},
+ {id:'sage',lab:'sage du quartier',age:72,s:'m',coif:'cheveux blancs crépus courts, barbe blanche',role:'conteur respecté qui transmet les histoires',tn:'fete'},
+ {id:'mamie',lab:'grand-mère',age:70,s:'f',coif:'cheveux blancs sous un foulard',role:'grand-mère bienveillante et pleine de sagesse',tn:'fete'},
+ {id:'prof',lab:'enseignant',age:36,s:'m',coif:'cheveux courts, petites lunettes',role:'maître d’école dévoué',tn:'h'},
+ {id:'lut',lab:'lutteur',age:26,s:'m',coif:'crâne rasé, silhouette athlétique et musclée',role:'combattant déterminé',tn:'h'},
+ {id:'comb',lab:'combattante',age:27,s:'f',coif:'tresses attachées en queue pour le combat',role:'athlète combattante agile et courageuse',tn:'f'}
+];
+const PEAUX=['peau noire profonde','peau brun foncé','peau ébène','peau brun chocolat'];
+const TEINTS=[['peau noire profonde','Noir profond'],['peau très foncée','Très foncé'],['peau brun foncé','Brun foncé'],['peau brun chocolat','Brun chocolat'],['peau brun clair','Brun clair'],['peau claire','Clair']];
+const COIFFURES=['cheveux ras','cheveux crépus courts','afro naturel','tresses','nattes collées','locks (dreadlocks)','crâne rasé','cheveux gris ou blancs','foulard ou turban','cheveux défrisés mi-longs'];
+
+/* ---------- Fantastique / héroïque ----------
+   Options inspirées des mangas d'action et de magie (arts de combat, armes, cercles magiques),
+   réécrites de façon originale : aucun nom de personnage, de technique ou de costume d'une œuvre existante. */
+const VOIES=[
+ {k:'ombre',t:'Arts de l’ombre (agilité, furtivité, sceaux)',v:'arts de l’ombre : vitesse et agilité surhumaines, déplacements furtifs, clones d’illusion, outils de lancer, sceaux de papier'},
+ {k:'incant',t:'Magie par incantation',v:'magie par incantation : le lanceur récite une formule courte, mains tendues, des mots de pouvoir lumineux flottent dans l’air'},
+ {k:'cercles',t:'Magie des cercles superposés',v:'magie des cercles : plusieurs cercles magiques superposés en couches s’allument autour du lanceur'},
+ {k:'gmage',t:'Guerrier-mage (lame et magie)',v:'guerrier-mage : combat à l’arme blanche renforcé par la magie, lame enveloppée d’énergie'},
+ {k:'invoc',t:'Invocation d’esprits-compagnons',v:'invocation : un cercle au sol fait surgir un esprit-animal géant ou un esprit ancestral lumineux qui combat aux côtés du héros'},
+ {k:'annul',t:'Annulation de magie et contre-sorts',v:'annulation de magie : le héros dissout d’un geste les sorts adverses, l’énergie ennemie se brise en particules lumineuses'},
+ {k:'ancien',t:'Pouvoir ancien et yeux de pouvoir',v:'pouvoir ancien : héros revenu d’une ère lointaine, puissance immense mais maîtrisée avec calme, yeux aux motifs magiques lumineux'},
+ {k:'corps',t:'Corps renforcé (force et vitesse)',v:'corps renforcé : force et vitesse surhumaines, coups portés avec de l’énergie concentrée dans les poings et les jambes'},
+ {k:'illusion',t:'Illusions et manipulation de l’esprit',v:'illusions : décors qui se déforment, doubles trompeurs, visions qui désorientent l’adversaire'},
+ {k:'sceaux',t:'Sceaux, parchemins et pièges',v:'sceaux : parchemins et symboles gravés qui forment barrières, pièges et armes cachées'}
+];
+const ELEMS=[
+ {k:'feu',t:'Feu',v:'feu'},{k:'eau',t:'Eau',v:'eau'},{k:'vent',t:'Vent',v:'vent'},{k:'foudre',t:'Foudre',v:'foudre'},
+ {k:'terre',t:'Terre',v:'terre et roche'},{k:'lumiere',t:'Lumière',v:'lumière'},{k:'ombre',t:'Ombre',v:'ombre'},
+ {k:'glace',t:'Glace',v:'glace'},{k:'vegetal',t:'Végétal',v:'plantes et racines vivantes'},
+ {k:'esprit',t:'Esprits ancestraux',v:'énergie des esprits ancestraux, sous forme de silhouettes lumineuses'},{k:'pur',t:'Énergie pure (sans élément)',v:'énergie pure sans élément'}
+];
+const ARMES=[
+ {k:'aucune',t:'Aucune (techniques à mains nues)',v:'aucune arme, techniques à mains nues'},
+ {k:'lames',t:'Lames courtes et couteaux de lancer',v:'lames courtes et couteaux de lancer'},
+ {k:'fils',t:'Étoiles de lancer et fils tendus',v:'étoiles de lancer et fils tendus servant de pièges'},
+ {k:'epee',t:'Épée longue',v:'épée longue à une main'},
+ {k:'epee_e',t:'Épée enveloppée d’énergie',v:'épée dont la lame est enveloppée d’énergie lumineuse'},
+ {k:'lance_bouclier',t:'Lance courte et grand bouclier (tradition d’Afrique australe)',v:'lance courte et grand bouclier, inspirés des traditions guerrières d’Afrique australe'},
+ {k:'hunga',t:'Couteau de lancer à lames multiples (tradition d’Afrique centrale)',v:'couteau de lancer à plusieurs lames, inspiré des traditions d’Afrique centrale'},
+ {k:'baton',t:'Bâton de combat ou bâton de mage',v:'bâton de combat long, parfois couronné d’un cristal'},
+ {k:'arc',t:'Arc et flèches enchantées',v:'arc et flèches enchantées laissant une traînée lumineuse'},
+ {k:'faux',t:'Grande lame courbe ou faux',v:'grande lame courbe à long manche'},
+ {k:'masse',t:'Masse ou massue',v:'masse ou massue massive'},
+ {k:'chaines',t:'Chaînes et cordes enchantées',v:'chaînes et cordes enchantées qui obéissent au héros'},
+ {k:'bouclier_epee',t:'Bouclier et épée',v:'bouclier rond et épée'},
+ {k:'pistolet',t:'Pistolet à énergie (science-fantasy)',v:'pistolet à énergie de style science-fantasy, sans effet sanglant'}
+];
+const CERCLES=[
+ {k:'aucun',t:'Aucun cercle magique',v:''},
+ {k:'simple',t:'Cercle simple lumineux avec symboles',v:'un cercle magique simple et lumineux, rempli de symboles'},
+ {k:'double',t:'Deux cercles concentriques en rotation',v:'deux cercles concentriques tournant en sens inverse, symboles lumineux entre les anneaux'},
+ {k:'huit',t:'Cercle avec étoile à huit branches',v:'un cercle magique contenant une étoile à huit branches'},
+ {k:'multi',t:'Cercles multicouches (3 à 5 couches)',v:'trois à cinq cercles magiques superposés en profondeur, chacun avec ses propres symboles, formant une formation complexe'},
+ {k:'sol',t:'Grand cercle au sol (zone d’invocation)',v:'un grand cercle magique tracé au sol qui s’étend et illumine la zone'},
+ {k:'main',t:'Petit cercle dans la paume de la main',v:'un petit cercle magique qui s’ouvre devant la paume du lanceur'},
+ {k:'ciel',t:'Cercle géant dans le ciel',v:'un cercle magique géant déployé dans le ciel au-dessus des combattants'},
+ {k:'chaine',t:'Cercles reliés par des lignes lumineuses',v:'plusieurs cercles reliés entre eux par des lignes lumineuses, comme un réseau de sceaux'}
+];
+const MOTIFS=[
+ {k:'runes',t:'Runes lumineuses inventées',v:'runes lumineuses entièrement inventées'},
+ {k:'adinkra',t:'Symboles adinkra (Ghana, Côte d’Ivoire)',v:'symboles inspirés des adinkra (Ghana, Côte d’Ivoire), utilisés comme décoration'},
+ {k:'kuba',t:'Motifs géométriques Kuba (RD Congo)',v:'motifs géométriques inspirés du tissu Kuba (RD Congo)'},
+ {k:'tiebele',t:'Motifs Tiébélé (Burkina Faso)',v:'motifs géométriques peints inspirés de l’architecture Tiébélé (Burkina Faso)'},
+ {k:'bogolan',t:'Motifs bogolan (Mali)',v:'motifs inspirés du tissu bogolan (Mali)'},
+ {k:'kente',t:'Motifs de tissu kente (Ghana, Togo)',v:'bandes et motifs inspirés du tissu kente tissé'},
+ {k:'nsibidi',t:'Signes nsibidi (Nigéria, Cameroun)',v:'signes inspirés de l’écriture nsibidi, utilisés comme décoration'},
+ {k:'cauris',t:'Cauris et perles',v:'cauris et perles disposés en cercle'}
+];
+const COULS=[
+ {k:'or',t:'Or doré',v:'or doré'},{k:'bleu',t:'Bleu électrique',v:'bleu électrique'},{k:'rouge',t:'Rouge feu',v:'rouge feu'},
+ {k:'vert',t:'Vert émeraude',v:'vert émeraude'},{k:'violet',t:'Violet',v:'violet'},{k:'blanc',t:'Blanc lumineux',v:'blanc lumineux'},
+ {k:'orange',t:'Orange',v:'orange'},{k:'turq',t:'Turquoise',v:'turquoise'},{k:'sombre',t:'Noir et violet sombre',v:'noir et violet sombre'}
+];
+const PUISS=[
+ {k:'app',t:'Apprenti : pouvoirs naissants',v:'apprenti, pouvoirs naissants et maladroits'},
+ {k:'conf',t:'Confirmé : maîtrise solide',v:'confirmé, maîtrise solide'},
+ {k:'maitre',t:'Maître : pouvoir impressionnant',v:'maître, pouvoir impressionnant'},
+ {k:'legende',t:'Légendaire : pouvoir qui change le paysage',v:'légendaire, pouvoir qui transforme le paysage'}
+];
+const MOTIF_PAYS={
+ togo:'motifs de tissus kenté tissés et symboles ewé',benin:'motifs des tentures appliquées d’Abomey',ghana:'symboles adinkra et motifs du tissu kente',
+ nigeria:'signes nsibidi et tissus adire teints à l’indigo',senegal:'motifs de tissages, de perles et de bijoux traditionnels',mali:'motifs du tissu bogolan',
+ civ:'symboles adinkra et motifs de tissus baoulé',burkina:'motifs peints Tiébélé et tissus Faso Dan Fani',cameroun:'motifs du toghu et de l’art bamoun',
+ rdc:'motifs géométriques du tissu Kuba',kenya:'motifs de perlage et de tissus kanga',ethiopie:'motifs géométriques des tissages traditionnels',afsud:'motifs peints et perlés ndebele'
+};
+const FANT=[
+ {id:'fapm',lab:'apprenti mage',age:15,s:'m',coif:'cheveux courts avec une mèche colorée',role:'apprenti mage maladroit mais déterminé',tn:'h',sug:{voie:'incant',elem:'feu',arme:'baton',cercle:'main'}},
+ {id:'fapf',lab:'apprentie mage',age:15,s:'f',coif:'nattes avec perles lumineuses',role:'apprentie mage brillante et têtue',tn:'f',sug:{voie:'cercles',elem:'eau',arme:'baton',cercle:'double'}},
+ {id:'fmcm',lab:'maître des cercles',age:50,s:'m',coif:'cheveux gris courts, barbe soignée',role:'maître des cercles magiques, calme et redoutable',tn:'fete',sug:{voie:'cercles',elem:'lumiere',arme:'aucune',cercle:'multi'}},
+ {id:'fmcf',lab:'maîtresse des cercles',age:48,s:'f',coif:'coiffure haute ornée de cauris',role:'maîtresse des cercles magiques, stratège',tn:'fete',sug:{voie:'cercles',elem:'terre',arme:'baton',cercle:'ciel'}},
+ {id:'fgm',lab:'guerrier-mage',age:28,s:'m',coif:'cheveux courts, silhouette athlétique',role:'guerrier-mage protecteur du village',tn:'h',sug:{voie:'gmage',elem:'foudre',arme:'epee_e',cercle:'main'}},
+ {id:'fgf',lab:'guerrière-mage',age:27,s:'f',coif:'tresses attachées en queue',role:'guerrière-mage rapide et courageuse',tn:'f',sug:{voie:'gmage',elem:'vent',arme:'lance_bouclier',cercle:'sol'}},
+ {id:'fom',lab:'ombre agile',age:20,s:'m',coif:'cheveux ras, silhouette souple',role:'éclaireur furtif et malin',tn:'h',sug:{voie:'ombre',elem:'ombre',arme:'lames',cercle:'chaine'}},
+ {id:'fof',lab:'ombre agile',age:20,s:'f',coif:'tresses collées',role:'éclaireuse furtive et moqueuse',tn:'f',sug:{voie:'ombre',elem:'vent',arme:'fils',cercle:'main'}},
+ {id:'fesm',lab:'gardien des esprits',age:38,s:'m',coif:'locks attachés',role:'gardien des esprits qui parle aux ancêtres',tn:'fete',sug:{voie:'invoc',elem:'esprit',arme:'baton',cercle:'sol'}},
+ {id:'fesf',lab:'gardienne des esprits',age:38,s:'f',coif:'foulard noué orné de perles',role:'gardienne des esprits et des forêts',tn:'fete',sug:{voie:'invoc',elem:'vegetal',arme:'aucune',cercle:'sol'}},
+ {id:'fsm',lab:'sage ancien',age:76,s:'m',coif:'cheveux blancs crépus, barbe blanche',role:'sage détenteur d’un pouvoir ancien',tn:'fete',sug:{voie:'ancien',elem:'lumiere',arme:'baton',cercle:'multi'}},
+ {id:'fsf',lab:'grande sage',age:72,s:'f',coif:'cheveux blancs sous un grand foulard',role:'grande sage dont la mémoire traverse les ères',tn:'fete',sug:{voie:'ancien',elem:'esprit',arme:'aucune',cercle:'ciel'}},
+ {id:'fhm',lab:'héros réincarné',age:17,s:'m',coif:'cheveux courts, regard calme',role:'héros revenu d’une ère lointaine, puissant mais discret',tn:'h',sug:{voie:'ancien',elem:'ombre',arme:'epee_e',cercle:'multi'}},
+ {id:'fhf',lab:'héroïne réincarnée',age:17,s:'f',coif:'tresses longues',role:'héroïne revenue d’une ère lointaine, puissante mais discrète',tn:'f',sug:{voie:'ancien',elem:'foudre',arme:'epee',cercle:'huit'}},
+ {id:'fpm',lab:'professeur de magie',age:34,s:'m',coif:'cheveux courts en désordre',role:'professeur de magie négligé qui annule les sorts d’un geste',tn:'h',sug:{voie:'annul',elem:'pur',arme:'pistolet',cercle:'main'}},
+ {id:'fpf',lab:'professeure de magie',age:33,s:'f',coif:'afro naturel',role:'professeure de magie excentrique, experte en contre-sorts',tn:'f',sug:{voie:'annul',elem:'lumiere',arme:'bouclier_epee',cercle:'double'}}
+];
+function presetsFant(c){
+ let im=3,iff=3;
+ return FANT.map((a,i)=>{
+  const pool=a.s==='m'?c.m:c.f,idx=a.s==='m'?im++:iff++,nom=pool[idx%pool.length];
+  const base=a.tn==='fete'?c.tenue.fete:(a.s==='m'?c.tenue.h:c.tenue.f);
+  const desc=nom+', '+sexNoun(a.s,a.age)+' de '+a.age+' ans ('+c.nom+'), '+PEAUX[i%PEAUX.length]+', '+a.coif+', '+a.role+', tenue héroïque fantastique inspirée de la tradition vestimentaire du pays ('+base+')';
+  return {id:a.id,label:'✨ '+nom+' — '+a.lab+' ('+a.age+' ans)',desc,sug:a.sug,nom};
+ });
+}
+function pickBy(a,k){return a.find(x=>x.k===k)}
+function motifPays(){return MOTIF_PAYS[countryKey()]||'motifs géométriques inspirés des arts décoratifs de la région'}
+function fillFantasy(){
+ const c=curCountry(),mk=a=>[{items:a.map(x=>({value:x.k,text:x.t}))}];
+ setOptions($('fVoie'),mk(VOIES));setOptions($('fElem'),mk(ELEMS));setOptions($('fArme'),mk(ARMES));
+ setOptions($('fCercle'),mk(CERCLES));setOptions($('fCoul'),mk(COULS));setOptions($('fPuis'),mk(PUISS));
+ setOptions($('fMotif'),[{items:[{value:'pays',text:'Motifs de '+c.nom+' : '+motifPays()}].concat(MOTIFS.map(x=>({value:x.k,text:x.t})))}]);
+}
+function fantText(){
+ const g=(a,id)=>{const x=pickBy(a,$(id).value);return x?x.v:''};
+ let t='SYSTÈME DE POUVOIRS : '+g(VOIES,'fVoie')+'. Élément dominant : '+g(ELEMS,'fElem')+'. Couleur de l’énergie : '+g(COULS,'fCoul')+'. Niveau de puissance : '+g(PUISS,'fPuis')+'.\n';
+ t+='ARME : '+g(ARMES,'fArme')+'.\n';
+ const ci=g(CERCLES,'fCercle');
+ if(ci){const mot=$('fMotif').value==='pays'?motifPays():g(MOTIFS,'fMotif');t+='CERCLE MAGIQUE : '+ci+(mot?'. Motifs décoratifs du cercle : '+mot:'')+'.\n'}
+ return t;
+}
+function syncScene(){
+ const t=$('sceneType').value;
+ $('combatBox').hidden=t==='normal';$('fantBox').hidden=t!=='fantasy';$('combatTypeWrap').hidden=t==='fantasy';
+}
+function syncSugg(){
+ const p=CH[$('char1').value],box=$('sugg');
+ if(!p||!p.sug){box.hidden=true;box.innerHTML='';return}
+ const s=p.sug,names=[pickBy(VOIES,s.voie),pickBy(ELEMS,s.elem),pickBy(ARMES,s.arme),pickBy(CERCLES,s.cercle)].map(x=>x?x.t:'');
+ box.innerHTML='';
+ const d=document.createElement('div');d.textContent='💡 Suggestion pour '+p.nom+' : '+names.join(' · ');
+ const b=document.createElement('button');b.textContent='Appliquer ces choix fantastiques';
+ b.onclick=()=>{$('fVoie').value=s.voie;$('fElem').value=s.elem;$('fArme').value=s.arme;$('fCercle').value=s.cercle;$('sceneType').value='fantasy';syncScene();$('fantBox').scrollIntoView({behavior:'smooth',block:'start'})};
+ box.append(d,b);box.hidden=false;
+}
+
+/* ---------- Décors fantastiques par pays ---------- */
+const FDEC={
+ togo:{r:'maisons-forteresses en terre des Tata Tamberma, tours rondes en ruine et greniers de terre (nord du Togo)',f:'bois sacré aux arbres immenses, sentiers de latérite rouge et lianes, inspiré des forêts sacrées du sud du Togo',a:'plateforme de pierre en lévitation au-dessus d’une lagune bordée de cocotiers et de pirogues, côte d’Aného'},
+ benin:{r:'murs de terre rouge d’un ancien palais royal en ruine, bas-reliefs colorés rongés par le temps (inspiré d’Abomey)',f:'forêt sacrée aux arbres géants et aux statues couvertes de mousse (région de Ouidah)',a:'arène en lévitation au-dessus du lac Nokoué, maisons sur pilotis en contrebas (inspiré de Ganvié)'},
+ ghana:{r:'ancien fort côtier en ruine aux murs blanchis par le sel, canons rouillés face à l’océan',f:'forêt sacrée ashanti aux fromagers géants, sentiers de terre rouge et tissus kente accrochés aux branches',a:'arène en lévitation au-dessus du lac Volta, pirogues de pêcheurs en contrebas'},
+ nigeria:{r:'remparts de terre d’une ancienne cité royale, fossés et portes écroulés (inspiré des murs d’Ife et de Bénin)',f:'bois sacré yoruba aux sculptures de bois, rivière sinueuse et grands arbres',a:'arène en lévitation au-dessus de la lagune de Lagos, maisons sur pilotis en contrebas'},
+ senegal:{r:'cercle de pierres dressées anciennes dans la savane (inspiré des sites mégalithiques de Sénégambie)',f:'forêt sacrée de baobabs géants et de mangrove',a:'arène en lévitation au-dessus du delta du Saloum, îles de coquillages et pirogues'},
+ mali:{r:'murs de terre banco d’une ancienne cité du Sahel, mosquée en terre à moitié effondrée (inspiré de Djenné et Tombouctou)',f:'bois sacré au pied d’une falaise de grès (inspiré de la falaise de Bandiagara)',a:'arène en lévitation au-dessus du fleuve Niger et de ses pinasses'},
+ civ:{r:'ruines d’anciennes mosquées soudanaises en terre (inspiré de Kong)',f:'forêt dense de l’ouest avec ponts de lianes suspendus (région de Man)',a:'arène en lévitation au-dessus de la lagune Ébrié, entre palmiers et pirogues'},
+ burkina:{r:'enceinte de pierre d’une ancienne cité fortifiée en ruine (inspiré de Loropéni)',f:'bois sacré de grands karités et de baobabs, sentiers de latérite',a:'arène en lévitation au-dessus d’un grand lac du Sahel, baobabs sur les rives'},
+ cameroun:{r:'ancien palais de chefferie de l’Ouest en ruine, grands piliers de bois sculptés et toits de chaume effondrés',f:'forêt équatoriale du Sud, arbres géants, brume et lianes',a:'arène en lévitation au-dessus du fleuve Wouri et des mangroves de Douala'},
+ rdc:{r:'murs de pierre couverts de végétation d’un ancien royaume du Congo',f:'forêt tropicale du bassin du Congo, arbres immenses, brume et lumière filtrée',a:'arène en lévitation au-dessus du fleuve Congo et de ses rapides'},
+ kenya:{r:'ruines en pierre de corail d’une cité swahilie ancienne, arches et puits (inspiré de Gedi)',f:'bois sacré de la côte, grands arbres et sentiers (inspiré des forêts kaya)',a:'arène en lévitation au-dessus d’un lac de la vallée du Rift, flamants roses en contrebas'},
+ ethiopie:{r:'obélisques de pierre anciens et tombes monumentales en ruine (inspiré d’Aksoum)',f:'forêt ancienne aux arbres centenaires entourant un sanctuaire de pierre',a:'arène en lévitation au-dessus du lac Tana et de ses îles'},
+ afsud:{r:'murs de pierre sèche d’une ancienne cité sur une colline (inspiré de Mapungubwe)',f:'forêt de montagne aux grands arbres et à la brume (région du Drakensberg)',a:'arène en lévitation au-dessus des falaises et des cascades du Drakensberg'},
+ afrique:{r:'ruines d’une ancienne cité africaine, murs de terre et de pierre envahis par la végétation',f:'forêt sacrée aux arbres immenses et aux sentiers anciens',a:'arène de pierre en lévitation au-dessus d’un grand fleuve'}
+};
+function shortTxt(t){return t.split(',')[0].split(' (')[0]}
+function syncDecor(){$('decorLibreBox').hidden=$('setting').value!=='libre'}
+function decorText(){return $('setting').value==='libre'?($('decorLibre').value.trim()||'[décor culturel à décrire]'):$('setting').value}
+function stash(){
+ if(!$('prompt').value)$('prompt').value=makePrompt();
+ try{localStorage.setItem('afribd_last_prompt',$('prompt').value);localStorage.setItem('afribd_last_dialogue',$('dialogue').value)}catch(e){}
+}
+
+/* ---------- État ---------- */
+let userChars=[];
+let CH={};
+function readJSON(k,d){try{const v=JSON.parse(localStorage.getItem(k)||'null');return v===null?d:v}catch(e){return d}}
+function countryKey(){return $('country').value||'togo'}
+function curCountry(){
+ const k=countryKey(),base=PAYS[k]||PAYS.afrique;
+ if(k==='autre'){return Object.assign({},base,{nom:($('otherCountry').value.trim()||'Afrique')})}
+ return base;
+}
+function sexNoun(s,age){return s==='m'?(age<18?'garçon':'homme'):(age<18?'fille':'femme')}
+function presetsFor(c){
+ let im=0,iff=0;
+ return ARCH.map((a,i)=>{
+  const pool=a.s==='m'?c.m:c.f,idx=a.s==='m'?im++:iff++,nom=pool[idx%pool.length];
+  const tenue=a.tn==='fete'?c.tenue.fete:(a.s==='m'?c.tenue.h:c.tenue.f);
+  const desc=nom+', '+sexNoun(a.s,a.age)+' de '+a.age+' ans ('+c.nom+'), '+PEAUX[i%PEAUX.length]+', '+a.coif+', '+a.role+', tenue : '+tenue;
+  return {id:a.id,label:nom+' — '+a.lab+' ('+a.age+' ans)',desc};
+ });
+}
+
+/* ---------- Listes dépendantes du pays ---------- */
+function setOptions(sel,groups){
+ const old=sel.value;sel.innerHTML='';
+ groups.forEach(g=>{
+  let parent=sel;
+  if(g.label){parent=document.createElement('optgroup');parent.label=g.label;sel.appendChild(parent)}
+  g.items.forEach(it=>{const o=document.createElement('option');o.value=it.value;o.textContent=it.text;parent.appendChild(o)});
+ });
+ if([...sel.options].some(o=>o.value===old))sel.value=old;
+}
+function fillCountries(){
+ setOptions($('country'),GROUPES.map(g=>({label:g[0],items:g[1].map(k=>({value:k,text:PAYS[k].label||PAYS[k].nom}))})));
+}
+function fillDecors(){
+ const c=curCountry(),k=countryKey(),groups=[];
+ if(c.decors.length)groups.push({label:'Décors typiques — '+c.nom,items:c.decors.map(d=>({value:d,text:d}))});
+ const f=k==='autre'?{r:'ruines inspirées de l’histoire et de l’architecture de '+c.nom,f:'forêt sacrée inspirée des paysages et des traditions de '+c.nom,a:'arène de pierre en lévitation au-dessus d’un paysage emblématique de '+c.nom}:(FDEC[k]||FDEC.afrique);
+ groups.push({label:'✨ Décors fantastiques — '+c.nom,items:[
+  {value:'Ruines anciennes : '+f.r+'. Ambiance fantastique et mystérieuse.',text:'🏛️ Ruines anciennes — '+shortTxt(f.r)},
+  {value:'Forêt sacrée : '+f.f+'. Ambiance fantastique, lumière mystérieuse.',text:'🌳 Forêt sacrée — '+shortTxt(f.f)},
+  {value:'Arène flottante : '+f.a+'. Ambiance épique et fantastique.',text:'🏟️ Arène flottante — '+shortTxt(f.a)}
+ ]});
+ groups.push({label:'Décors courants',items:DECORS_COMMUNS.map(d=>({value:d,text:d}))});
+ groups.push({items:[{value:'libre',text:'✍️ Décor culturel libre (je le décris)'}]});
+ setOptions($('setting'),groups);
+ syncDecor();
+}
+function fillCombat(){
+ const c=curCountry(),items=[];
+ if(c.combat)items.push({value:c.combat.nom+' : '+c.combat.desc,text:'🏅 '+c.combat.nom+' (tradition locale)'});
+ [['Lutte à mains nues, prises et projections','Lutte'],['Boxe','Boxe'],['Arts martiaux, coups de poing et de pied','Arts martiaux'],['Combat au bâton, sport traditionnel sans arme tranchante','Combat au bâton'],['Bagarre de rue entre jeunes, sans gravité (style BD)','Bagarre de rue'],['Duel de super-héros africains aux pouvoirs inspirés des légendes (fantastique)','Super-héros africains'],['Poursuite puis affrontement dans le quartier','Poursuite et affrontement'],['Duel de guerriers inspiré de l’histoire africaine (stylisé, sans gore)','Guerriers historiques']].forEach(x=>items.push({value:x[0],text:x[1]}));
+ setOptions($('combatType'),[{items}]);
+}
+function fillCreator(){
+ const c=curCountry();
+ setOptions($('cSkin'),[{items:TEINTS.map(t=>({value:t[0],text:t[1]}))}]);
+ if(!$('cSkin').dataset.init){$('cSkin').value='peau très foncée';$('cSkin').dataset.init='1'}
+ setOptions($('cHair'),[{items:COIFFURES.map(x=>({value:x,text:x}))}]);
+ setOptions($('cOutfit'),[{items:[
+  {value:c.tenue.h,text:'Quotidienne (homme) : '+c.tenue.h},
+  {value:c.tenue.f,text:'Quotidienne (femme) : '+c.tenue.f},
+  {value:c.tenue.fete,text:'Cérémonie : '+c.tenue.fete},
+  {value:'tenue moderne décontractée (jean et t-shirt)',text:'Moderne décontractée'},
+  {value:'uniforme scolaire',text:'Uniforme scolaire'},
+  {value:'tenue de sport',text:'Tenue de sport'},
+  {value:'tenue à préciser dans les accessoires',text:'Autre (je précise dans les accessoires)'}
+ ]}]);
+}
+function fillChars(){
+ const c=curCountry(),pre=presetsFor(c),fan=presetsFant(c);
+ CH={};
+ [['char1',false],['char2',true]].forEach(([id,withNone])=>{
+  const groups=[];
+  if(withNone)groups.push({items:[{value:'none',text:'— Aucun —'}]});
+  groups.push({label:'Personnages — '+c.nom,items:pre.map(p=>{CH['p:'+p.id]=p;return {value:'p:'+p.id,text:p.label}})});
+  groups.push({label:'✨ Héros fantastiques — '+c.nom,items:fan.map(p=>{CH['p:'+p.id]=p;return {value:'p:'+p.id,text:p.label}})});
+  if(userChars.length)groups.push({label:'Mes personnages',items:userChars.map(u=>{CH['u:'+u.id]=u;return {value:'u:'+u.id,text:u.label}})});
+  groups.push({items:[{value:'free',text:'✍️ Description libre…'}]});
+  setOptions($(id),groups);
+  if(withNone&&![...$(id).options].some(o=>o.value===$(id).value))$(id).value='none';
+ });
+ syncFree();syncSugg();
+}
+function syncFree(){$('free1').hidden=$('char1').value!=='free';$('free2').hidden=$('char2').value!=='free'}
+function charInfo(selId,freeId){
+ const v=$(selId).value;
+ if(v==='none')return {label:'',desc:''};
+ if(v==='free'){const t=$(freeId).value.trim();return {label:t?t.slice(0,40):'Personnage libre',desc:t}}
+ const p=CH[v];return p?{label:p.label,desc:p.desc}:{label:'',desc:''};
+}
+function updateInfo(){
+ const k=countryKey(),c=curCountry();
+ $('otherBox').hidden=k!=='autre';
+ let t='📍 '+(k==='autre'?c.nom:c.nom+' · '+c.ville)+' — prénoms, tenues et décors adaptés.';
+ if(c.combat)t+=' Tradition de combat proposée : '+c.combat.nom+'.';
+ $('countryInfo').textContent=t;
+}
+function applyCountry(save){
+ fillDecors();fillCombat();fillCreator();fillFantasy();fillChars();updateInfo();
+ if(save){try{localStorage.setItem(CKEY,countryKey())}catch(e){}}
+}
+$('country').onchange=()=>applyCountry(true);
+$('otherCountry').oninput=()=>{updateInfo();fillChars()};
+$('char1').onchange=()=>{syncFree();syncSugg()};$('char2').onchange=syncFree;
+$('sceneType').onchange=syncScene;
+
+/* ---------- Création libre de personnages ---------- */
+function saveUserChars(){try{localStorage.setItem(CHARS,JSON.stringify(userChars))}catch(e){alert('Stockage local indisponible ou plein.')}}
+function renderMyChars(){
+ const box=$('myChars');box.innerHTML='';
+ userChars.forEach(u=>{
+  const d=document.createElement('div');d.className='myChar';
+  const s=document.createElement('span');s.textContent=u.label;
+  const b=document.createElement('button');b.className='danger';b.textContent='Supprimer';
+  b.onclick=()=>{if(confirm('Supprimer ce personnage ?')){userChars=userChars.filter(x=>x.id!==u.id);saveUserChars();renderMyChars();fillChars()}};
+  d.append(s,b);box.appendChild(d);
+ });
+}
+$('cSave').onclick=()=>{
+ const name=$('cName').value.trim()||'Sans nom',age=Math.max(1,Math.min(110,parseInt($('cAge').value,10)||20)),s=$('cSex').value;
+ const acc=$('cAcc').value.trim(),trait=$('cTrait').value.trim(),c=curCountry();
+ const desc=name+', '+sexNoun(s,age)+' de '+age+' ans ('+c.nom+'), '+$('cSkin').value+', '+$('cHair').value+', tenue : '+$('cOutfit').value+(acc?', accessoires : '+acc:'')+(trait?', '+trait:'');
+ const u={id:Date.now(),label:name+' — '+sexNoun(s,age)+' ('+age+' ans)',desc};
+ userChars.push(u);saveUserChars();renderMyChars();fillChars();$('char1').value='u:'+u.id;syncFree();
+ ['cName','cAcc','cTrait'].forEach(id=>$(id).value='');
+ alert('Personnage enregistré et choisi comme Personnage 1.');
+};
+
+/* ---------- Prompt ---------- */
+function makePrompt(){
+ const c=curCountry(),st=$('sceneType').value,combat=st==='combat',fant=st==='fantasy',fight=combat||fant;
+ const a=charInfo('char1','free1'),b=charInfo('char2','free2');
+ const action=$('action').value.trim()||'[décrire précisément l’action des personnages]';
+ const dialogue=$('dialogue').value.trim(),notes=$('notes').value.trim();
+ const extra=countryKey()==='autre'?$('otherCulture').value.trim():'';
+ let t='Créer UNE illustration de bande dessinée originale'+(combat?' : SCÈNE DE COMBAT.':fant?' : COMBAT FANTASTIQUE ET HÉROÏQUE.':'.')+'\n\n';
+ t+='CULTURE ET PAYS : '+c.nom+(countryKey()==='autre'||countryKey()==='afrique'?'':' ('+c.ville+')')+(extra?' — '+extra:'')+'.\n';
+ t+='PERSONNAGE 1 : '+(a.desc||'[décrire le personnage principal]')+'.\n';
+ if(b.desc)t+='PERSONNAGE 2 : '+b.desc+'.\n';
+ else if(fight)t+='PERSONNAGE 2 (adversaire) : à décrire dans l’action.\n';
+ t+='DÉCOR : '+decorText()+'.\nACTION : '+action+'.\n';
+ if(fant)t+=fantText();
+ if(fight){
+  t+='COMBAT : '+(fant?'combat fantastique et héroïque':$('combatType').value)+'. Intensité : '+$('combatLevel').value+'. Moment : '+$('combatMoment').value+'.\n';
+  t+='MISE EN SCÈNE DU COMBAT : postures crédibles et lisibles, corps en mouvement, équilibre et poids du corps réalistes, les deux adversaires bien distincts'+($('fx').checked?', lignes de vitesse, poussière soulevée et effets de mouvement':'')+', foule ou témoins en arrière-plan si le décor s’y prête.\n';
+  if($('noGore').checked)t+='LIMITES : aucun sang, aucune blessure grave, aucune cruauté ; combat adapté à un public jeune.\n';
+ }
+ t+='CADRAGE ET POSE : '+$('pose').value+'.\nSTYLE : '+$('style').value+'.\n';
+ t+=dialogue?'DIALOGUE À INTÉGRER SI LE MODÈLE REND BIEN LE TEXTE :\n'+dialogue+'\n':'DIALOGUE : ne pas ajouter de texte ni de bulles non demandés.\n';
+ if(notes)t+='DÉTAILS À RESPECTER : '+notes+'\n';
+ t+='\nRESPECT CULTUREL : représenter '+c.nom+' de façon authentique, moderne et digne ; tenues, architecture, objets et décors réalistes et propres à ce pays ; éviter les clichés (pas de savane générique, pas de caricature, pas d’exotisme). Les personnages ont la carnation décrite, rendue avec des nuances de lumière naturelles et flatteuses.\n';
+ if(fant)t+='ORIGINALITÉ : pouvoirs, techniques, tenues et symboles entièrement originaux, inspirés du genre fantasy et shonen mais sans reprendre aucun personnage, costume, emblème ni technique d’une œuvre existante. Les motifs culturels sont purement décoratifs et représentés avec respect, sans caricature ni détournement d’objets sacrés.\n';
+ t+='COHÉRENCE VISUELLE : respecter la même apparence, la même carnation, la coiffure, les vêtements et les accessoires des personnages décrits. Anatomie naturelle, mains lisibles, expressions crédibles, composition claire, éclairage cohérent, contours nets, couleurs maîtrisées. Une seule scène, sans collage de plusieurs cases, sans logo, sans signature ni texte parasite.';
+ return t;
+}
+
+/* ---------- Carnet ---------- */
+function readScenes(){const v=readJSON(STORE,[]);return Array.isArray(v)?v:[]}
 function writeScenes(s){localStorage.setItem(STORE,JSON.stringify(s))}
-function currentScene(){return {id:Date.now(),created:new Date().toISOString(),character:$('character').value,characterLabel:$('character').selectedOptions[0].text,setting:$('setting').value,pose:$('pose').value,style:$('style').value,action:$('action').value,dialogue:$('dialogue').value,notes:$('notes').value,prompt:$('prompt').value}}
+function currentScene(){
+ const a=charInfo('char1','free1'),b=charInfo('char2','free2');
+ return {id:Date.now(),created:new Date().toISOString(),country:countryKey(),otherCountry:$('otherCountry').value,otherCulture:$('otherCulture').value,
+  char1:$('char1').value,char2:$('char2').value,free1:$('free1').value,free2:$('free2').value,char1Label:a.label,char2Label:b.label,
+  sceneType:$('sceneType').value,fVoie:$('fVoie').value,fElem:$('fElem').value,fArme:$('fArme').value,fCercle:$('fCercle').value,fMotif:$('fMotif').value,fCoul:$('fCoul').value,fPuis:$('fPuis').value,combatType:$('combatType').value,combatLevel:$('combatLevel').value,combatMoment:$('combatMoment').value,fx:$('fx').checked,noGore:$('noGore').checked,
+  setting:$('setting').value,decorLibre:$('decorLibre').value,pose:$('pose').value,style:$('style').value,action:$('action').value,dialogue:$('dialogue').value,notes:$('notes').value,prompt:$('prompt').value};
+}
 function renderScenes(){
- const box=$('scenes'), items=readScenes();
+ const box=$('scenes'),items=readScenes();
  if(!items.length){box.innerHTML='<p class="small">Aucune scène enregistrée pour le moment.</p>';return}
  box.innerHTML='';
  items.slice().reverse().forEach(item=>{
-   const div=document.createElement('div');div.className='scene';
-   const h=document.createElement('h3');h.textContent=item.characterLabel+' — '+item.setting;div.appendChild(h);
-   const p=document.createElement('p');p.textContent=item.action||'(Action non renseignée)';div.appendChild(p);
-   const b=document.createElement('div');b.className='buttons';
-   const load=document.createElement('button');load.className='secondary';load.textContent='Recharger';load.onclick=()=>loadScene(item.id);
-   const cp=document.createElement('button');cp.className='secondary';cp.textContent='Copier prompt';cp.onclick=()=>copyText(item.prompt);
-   const del=document.createElement('button');del.className='danger';del.textContent='Supprimer';del.onclick=()=>{if(confirm('Supprimer cette scène ?')){writeScenes(readScenes().filter(x=>x.id!==item.id));renderScenes()}};
-   b.append(load,cp,del);div.appendChild(b);box.appendChild(div);
+  const div=document.createElement('div');div.className='scene';
+  const h=document.createElement('h3');
+  h.textContent=(item.sceneType==='combat'?'⚔️ ':item.sceneType==='fantasy'?'✨ ':'')+(item.char1Label||item.characterLabel||'Scène')+(item.char2Label?' & '+item.char2Label:'')+' — '+(item.setting||'');
+  div.appendChild(h);
+  const p=document.createElement('p');p.textContent=item.action||'(Action non renseignée)';div.appendChild(p);
+  const b=document.createElement('div');b.className='buttons';
+  const load=document.createElement('button');load.className='secondary';load.textContent='Recharger';load.onclick=()=>loadScene(item.id);
+  const cp=document.createElement('button');cp.className='secondary';cp.textContent='Copier prompt';cp.onclick=()=>copyText(item.prompt);
+  const del=document.createElement('button');del.className='danger';del.textContent='Supprimer';del.onclick=()=>{if(confirm('Supprimer cette scène ?')){writeScenes(readScenes().filter(x=>x.id!==item.id));renderScenes()}};
+  b.append(load,cp,del);div.appendChild(b);box.appendChild(div);
  });
 }
+function setIf(id,v){if(v===undefined||v===null)return;const el=$(id);if(el.tagName==='SELECT'){if([...el.options].some(o=>o.value===v))el.value=v}else el.value=v}
 function loadScene(id){
  const s=readScenes().find(x=>x.id===id);if(!s)return;
- $('character').value=s.character;$('setting').value=s.setting;$('pose').value=s.pose;$('style').value=s.style;
- $('action').value=s.action;$('dialogue').value=s.dialogue;$('notes').value=s.notes;$('prompt').value=s.prompt;
+ if(s.country&&PAYS[s.country]){$('country').value=s.country}
+ setIf('otherCountry',s.otherCountry);setIf('otherCulture',s.otherCulture);
+ applyCountry(false);
+ if(s.char1===undefined&&s.character){$('char1').value='free';$('free1').value=s.character}
+ else{setIf('char1',s.char1);setIf('char2',s.char2);setIf('free1',s.free1);setIf('free2',s.free2)}
+ syncFree();
+ setIf('sceneType',s.sceneType||'normal');['fVoie','fElem','fArme','fCercle','fMotif','fCoul','fPuis'].forEach(k=>setIf(k,s[k]));syncScene();syncSugg();
+ setIf('combatType',s.combatType);setIf('combatLevel',s.combatLevel);setIf('combatMoment',s.combatMoment);
+ if(s.fx!==undefined)$('fx').checked=s.fx;if(s.noGore!==undefined)$('noGore').checked=s.noGore;
+ setIf('setting',s.setting);setIf('decorLibre',s.decorLibre);syncDecor();setIf('pose',s.pose);setIf('style',s.style);
+ $('action').value=s.action||'';$('dialogue').value=s.dialogue||'';$('notes').value=s.notes||'';$('prompt').value=s.prompt||'';
  window.scrollTo({top:0,behavior:'smooth'});
 }
 async function copyText(t){
@@ -161,15 +785,50 @@ function download(name,text,type){
  const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
 }
 $('generate').onclick=()=>{$('prompt').value=makePrompt();$('prompt').scrollIntoView({behavior:'smooth',block:'start'})};
-$('reset').onclick=()=>{if(confirm('Effacer les champs du formulaire ?')){['action','dialogue','notes','prompt'].forEach(id=>$(id).value='');$('character').selectedIndex=0;$('setting').selectedIndex=0;$('pose').selectedIndex=0;$('style').selectedIndex=0}};
+$('reset').onclick=()=>{if(confirm('Effacer les champs du formulaire ?')){
+ ['action','dialogue','notes','prompt','free1','free2','decorLibre'].forEach(id=>$(id).value='');
+ ['char1','pose','style','setting','combatType','combatLevel','combatMoment'].forEach(id=>$(id).selectedIndex=0);
+ $('char2').value='none';$('sceneType').value='normal';['fVoie','fElem','fArme','fCercle','fMotif','fCoul','fPuis'].forEach(k=>$(k).selectedIndex=0);syncScene();syncFree();syncSugg();
+}};
 $('copy').onclick=()=>copyText($('prompt').value);
 $('downloadPrompt').onclick=()=>{if(!$('prompt').value)$('prompt').value=makePrompt();download('afribd-prompt.txt',$('prompt').value,'text/plain;charset=utf-8')};
-$('openImage').onclick=()=>window.open('https://huggingface.co/spaces','_blank','noopener');
+$('openImage').onclick=()=>{stash();location.href='generateur.html'};
+$('openVoice').onclick=()=>{stash();location.href='voix.html'};
+$('setting').onchange=syncDecor;
 $('save').onclick=()=>{if(!$('prompt').value)$('prompt').value=makePrompt();const s=readScenes();s.push(currentScene());try{writeScenes(s);renderScenes();alert('Scène enregistrée sur ce téléphone.')}catch(e){alert('Stockage local indisponible ou plein. Exportez votre carnet et libérez de l’espace.')}};
-$('export').onclick=()=>download('afribd-carnet.json',JSON.stringify(readScenes(),null,2),'application/json');
+$('export').onclick=()=>download('afribd-carnet.json',JSON.stringify({format:'AfriBDStudioCarnet',version:3,scenes:readScenes(),characters:userChars},null,2),'application/json');
 $('importButton').onclick=()=>$('importFile').click();
-$('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const incoming=JSON.parse(await f.text());if(!Array.isArray(incoming))throw Error();const existing=readScenes();const ids=new Set(existing.map(x=>x.id));incoming.forEach(x=>{if(!ids.has(x.id)){x.id=Date.now()+Math.floor(Math.random()*100000);existing.push(x)}});writeScenes(existing);renderScenes();alert('Carnet importé.')}catch(err){alert('Fichier JSON non valide.')}e.target.value=''};
-renderScenes();
+$('importFile').onchange=async e=>{
+ const f=e.target.files[0];if(!f)return;
+ try{
+  const data=JSON.parse(await f.text());
+  const inScenes=Array.isArray(data)?data:(data&&Array.isArray(data.scenes)?data.scenes:null);
+  if(!inScenes)throw Error();
+  const existing=readScenes(),ids=new Set(existing.map(x=>x.id));
+  inScenes.forEach(x=>{if(!ids.has(x.id)){x.id=Date.now()+Math.floor(Math.random()*100000);existing.push(x)}});
+  writeScenes(existing);
+  if(data&&Array.isArray(data.characters)){const cid=new Set(userChars.map(x=>x.id));data.characters.forEach(u=>{if(u&&u.label&&u.desc&&!cid.has(u.id))userChars.push(u)});saveUserChars();renderMyChars();fillChars()}
+  renderScenes();alert('Carnet importé.');
+ }catch(err){alert('Fichier JSON non valide.')}
+ e.target.value='';
+};
+
+/* ---------- Mode léger ---------- */
+const LITE_KEY='afribd_studio_lite_v1';
+function applyLite(on){document.body.classList.toggle('lite',on)}
+function initLite(){
+ let on=false;try{on=localStorage.getItem(LITE_KEY)==='1'}catch(e){}
+ $('liteMode').checked=on;applyLite(on);
+ if(navigator.deviceMemory&&navigator.deviceMemory<=2)$('liteHint').textContent='Ton appareil semble avoir peu de mémoire : le mode léger est conseillé.';
+ $('liteMode').onchange=e=>{applyLite(e.target.checked);try{localStorage.setItem(LITE_KEY,e.target.checked?'1':'0')}catch(err){}};
+}
+
+/* ---------- Démarrage ---------- */
+initLogo();
+userChars=readJSON(CHARS,[]);if(!Array.isArray(userChars))userChars=[];
+fillCountries();
+(function(){let k='togo';try{k=localStorage.getItem(CKEY)||'togo'}catch(e){}if(!PAYS[k])k='togo';$('country').value=k})();
+applyCountry(false);renderMyChars();renderScenes();initLite();
 </script>
 </body>
 </html>
