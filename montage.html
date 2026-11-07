@@ -176,8 +176,8 @@ iframe{width:100%;height:calc(100vh - 150px);min-height:560px;border:0;border-ra
 
   <section class="card">
     <h2>5. Exporter</h2>
-    <label for="fmt" style="margin-top:0">Format de la vidéo</label>
-    <select id="fmt"><option value="webm">.webm (compatible partout où Chrome tourne)</option><option value="mp4">.mp4 si ce navigateur le permet</option></select>
+    <label style="margin-top:0">Format de la vidéo</label>
+    <div class="buttons" style="margin-top:0"><label class="chk" style="margin:0"><input type="radio" name="fmt" id="fmtW" value="webm" checked> .webm</label><label class="chk" style="margin:0"><input type="radio" name="fmt" id="fmtM" value="mp4"> .mp4 (si possible)</label></div>
     <p class="small" id="fmtInfo"></p>
     <div class="buttons" style="margin-top:0">
       <button class="primary" id="bExport">⬇ Exporter la vidéo</button>
@@ -585,11 +585,11 @@ const MP4S=['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4;codecs=avc1,mp4a
 const sup=t=>!!(window.MediaRecorder&&MediaRecorder.isTypeSupported(t));
 function pickVideoMime(){
  const mp4=MP4S.find(sup)||'',webm=WEBMS.find(sup)||'';
- if($('fmt').value==='mp4'){if(mp4)return mp4;toast('Le .mp4 n’est pas disponible ici : export en .webm.')}
+ if($('fmtM').checked){if(mp4)return mp4;toast('Le .mp4 n’est pas disponible ici : export en .webm.')}
  return webm||mp4||'';
 }
-function fmtInfo(){const ok=!!MP4S.find(sup);$('fmtInfo').textContent=ok?'Ce navigateur sait enregistrer en .mp4 : tu peux le choisir.':'Ce navigateur ne sait pas enregistrer en .mp4 : l’export restera en .webm (convertis-le ensuite avec un outil gratuit).';try{const v=localStorage.getItem('afribd_montage_fmt');if(v&&(v==='webm'||(v==='mp4'&&ok)))$('fmt').value=v}catch(e){}}
-$('fmt').onchange=()=>{try{localStorage.setItem('afribd_montage_fmt',$('fmt').value)}catch(e){}};
+function fmtInfo(){const ok=!!MP4S.find(sup);$('fmtInfo').textContent=ok?'Ce navigateur sait enregistrer en .mp4 : tu peux le choisir.':'Ce navigateur ne sait pas enregistrer en .mp4 : l’export restera en .webm (convertis-le ensuite avec un outil gratuit).';try{const v=localStorage.getItem('afribd_montage_fmt');if(v==='mp4'&&ok)$('fmtM').checked=true}catch(e){}}
+document.querySelectorAll('input[name=fmt]').forEach(r=>r.onchange=()=>{try{localStorage.setItem('afribd_montage_fmt',r.value)}catch(e){}});
 fmtInfo();
 $('bExport').onclick=async()=>{
  if(exporting)return;
