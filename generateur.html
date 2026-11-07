@@ -54,7 +54,11 @@ button:active{transform:scale(.97)}
     <textarea id="base" style="min-height:190px" placeholder="Prépare d'abord ta scène dans l'atelier de scènes, ou écris ici une description : personnages, décor, action, cadrage."></textarea>
     <div><span class="status warn" id="check">Description à vérifier</span></div>
     <label for="avoid">Éléments à ne PAS ajouter</label>
-    <input id="avoid" value="texte parasite, logo, signature, personnages supplémentaires, mains déformées, personnage ou costume d'une œuvre existante">
+    <input id="avoid" value="texte parasite dans le décor, logo, signature, personnages supplémentaires, mains déformées, personnage ou costume d'une œuvre existante">
+    <p class="small"><b>Signature du studio (incluse dans chaque image) :</b> « AfriBD Studio by Elpidjio KPOTSI » — texte fixe, non modifiable. Tu choisis seulement sa position.</p>
+    <input type="hidden" id="sigOn" value="1"><input type="hidden" id="sigTxt" value="AfriBD Studio by Elpidjio KPOTSI">
+    <select id="sigPos" aria-label="Position de la signature"><option value="en bas à droite">En bas à droite</option><option value="en bas à gauche">En bas à gauche</option><option value="en haut à droite">En haut à droite</option><option value="en haut à gauche">En haut à gauche</option></select>
+    <p class="small">Les générateurs d'images écrivent parfois mal les lettres. Si le nom est faux, relance une fois, ou ajoute-le après avec la signature de NOUTALA ZONE (toujours exacte).</p>
     <label class="chk"><input type="checkbox" id="lock" checked> Verrouiller : n'ajouter aucun élément non décrit</label>
   </section>
 
@@ -84,6 +88,21 @@ button:active{transform:scale(.97)}
     </div>
     <div class="notice">Cette page ne génère rien elle-même et ne consomme aucun crédit : elle copie le prompt et ouvre le service. Chaque service applique ses propres limites gratuites et conditions (à la date de nos vérifications, le 2 novembre 2026 : Meta ne publie pas de plafond officiel pour Meta AI, des utilisateurs en signalent environ 25 images par jour ; ChatGPT gratuit applique une limite hebdomadaire non publiée). Je n'ai pas pu confirmer la disponibilité de Meta AI dans chaque pays.</div>
     <p class="small">Ensuite : enregistre l'image obtenue, puis importe-la comme référence dans NOUTALA ZONE pour la retoucher.</p>
+  </section>
+
+  <section class="card c3" id="sheetCard">
+    <h2>3 bis. Planche de référence et vérification</h2>
+    <p class="small">Pour garder le même personnage d'une image à l'autre : génère d'abord une planche (face, profil, dos, visage), puis joins-la à chaque nouvelle génération, dans la même conversation du service.</p>
+    <label for="sheetChar">Personnage de la planche</label>
+    <select id="sheetChar"></select>
+    <textarea id="sheetFinal" readonly style="min-height:150px;margin-top:8px;background:#f4fbff" placeholder="Décris d'abord un personnage dans la scène : la planche apparaît ici."></textarea>
+    <div class="buttons"><button class="primary" id="sheetCopy">Copier le prompt de la planche</button><button class="secondary" id="sheetGpt">Copier et ouvrir ChatGPT</button><button class="secondary" id="sheetMeta">Copier et ouvrir Meta AI</button></div>
+    <label class="chk" style="margin-top:10px"><input type="checkbox" id="useSheet"> J'ai joint la planche de référence à ma génération (ajoute la consigne au prompt de la scène)</label>
+    <h3 style="margin:14px 0 4px">Vérifier l'image obtenue</h3>
+    <p class="small">Coche ce qui est correct. Ce qui reste décoché devient une phrase de correction à coller dans la conversation.</p>
+    <div id="checkList"></div>
+    <textarea id="fixFinal" readonly style="min-height:110px;margin-top:8px;background:#fff8f0" placeholder="Les corrections apparaîtront ici."></textarea>
+    <div class="buttons"><button class="primary" id="fixCopy">Copier la correction</button></div>
   </section>
 
   <section class="card c4">
@@ -161,6 +180,7 @@ function styleLine(){
  if(r==='anime')return 'STYLE : anime en couleur : aplats nets, ombrage de dessin animé, couleurs vives et lumineuses, yeux expressifs, mouvement dynamique.';
  return null;
 }
+const SIGNATURE='AfriBD Studio by Elpidjio KPOTSI';
 function buildFinal(){
  let t=$('base').value.trim();
  if(!t){$('final').value='';return}
@@ -168,21 +188,25 @@ function buildFinal(){
  if(sl){if(/^STYLE :.*$/m.test(t))t=t.replace(/^STYLE :.*$/m,sl);else t+='\n'+sl}
  if($('render').value==='shonen')t=t.replace('couleurs maîtrisées','tons de gris et noirs maîtrisés');
  t+='\nFORMAT : '+$('ratio').value+'.';
- const av=$('avoid').value.trim();
+ let av=$('avoid').value.trim();
+ const sg=SIGNATURE;
+ if(sg)av=av.replace(/(^|,\s*)signature(\s*,|$)/i,'$1').replace(/^[,\s]+|[,\s]+$/g,'').replace(/,\s*,/g,',').replace(/\s{2,}/g,' ');
  if(av)t+='\nNE PAS AJOUTER : '+av+'.';
- if($('lock').checked)t+='\nVERROUILLAGE : représenter uniquement ce qui est décrit ci-dessus ; n\'ajouter aucun personnage, objet, texte ou élément non mentionné ; si une information manque, choisir l\'option la plus simple et neutre.';
+ if(sg)t+='\nSIGNATURE : écrire exactement « '+sg+' » en petites lettres lisibles, '+$('sigPos').value+' de l\'image, une seule fois, orthographe exacte, sans autre texte.';
+ if($('useSheet').checked)t+='\nRÉFÉRENCE JOINTE : l\'image jointe est la planche de référence du personnage. Reproduire EXACTEMENT ce personnage (visage, coiffure, signes distinctifs, corpulence, tenue, couleurs) sans le réinterpréter ; seuls la pose, l\'expression et le décor changent selon la scène.';
+ if($('lock').checked)t+='\nVERROUILLAGE : représenter uniquement ce qui est décrit ci-dessus ; n\'ajouter aucun personnage, objet, texte ou élément non mentionné (sauf la SIGNATURE et les répliques demandées) ; si une information manque, choisir l\'option la plus simple et neutre.';
  $('final').value=t;
 }
 function videoPrompt(){
  const act=$('vAction').value.trim();
  if(act.length<30||!$('vCam').value||!$('base').value.trim())return '';
- const keep=$('base').value.split('\n').filter(l=>/^(CULTURE ET PAYS|PERSONNAGE \d|DÉCOR|SYSTÈME DE POUVOIRS|ARME|CERCLE MAGIQUE|COMBAT) :/.test(l)).join('\n');
+ const keep=$('base').value.split('\n').filter(l=>/^(CULTURE ET PAYS|CONTEXTE CULTUREL VISUEL \(ne jamais écrire de nom de pays ni de ville dans l’image\)|PERSONNAGE \d|DÉCOR|SYSTÈME DE POUVOIRS|ARME|CERCLE MAGIQUE|COMBAT) :/.test(l)).join('\n');
  const r=$('render').value;
  const rl=r==='shonen'?'RENDU : manga animé en noir et blanc, encre, trames, lignes de vitesse.':r==='anime'?'RENDU : anime en couleur, aplats nets, couleurs vives.':'';
  return 'VIDÉO COURTE DE '+$('vDur').value+', format '+$('ratio').value+'.\n'+(keep?keep+'\n':'')+'ACTION DE LA VIDÉO (début → fin) : '+act+'\nCAMÉRA : '+$('vCam').value+'.\nÀ GARDER IDENTIQUE : '+($('vKeep').value.trim()||'mêmes personnages et décor')+'.\n'+(rl?rl+'\n':'')+'NE PAS AJOUTER : texte, logo, personnages supplémentaires, éléments non décrits. Mouvements fluides et crédibles, sans déformation des visages ni des mains. Pas de sang, public jeune.';
 }
-function refresh(){checkBase();buildFinal();$('vFinal').value=videoPrompt();}
-['base','avoid','lock','render','ratio','vAction','vDur','vCam','vKeep'].forEach(id=>{$(id).addEventListener('input',refresh);$(id).addEventListener('change',refresh)});
+function refresh(){checkBase();buildFinal();$('vFinal').value=videoPrompt();if(typeof refreshSheet==='function')refreshSheet();}
+['base','avoid','lock','render','ratio','vAction','vDur','vCam','vKeep','sigPos','useSheet'].forEach(id=>{$(id).addEventListener('input',refresh);$(id).addEventListener('change',refresh)});
 $('vSvc').onchange=renderPriv;
 
 async function copy(t){
@@ -208,6 +232,59 @@ function needVideo(){
 }
 $('vCopy').onclick=()=>{const v=needVideo();if(v)copyThen(v,null)};
 $('vOpen').onclick=()=>{const v=needVideo();if(v)copyThen(v,SERVICES[$('vSvc').value].url)};
+
+
+/* ---------- planche de référence et vérification ---------- */
+function sceneChars(){return $('base').value.split('\n').map(l=>l.match(/^PERSONNAGE (\d)[^:]*: (.*)$/)).filter(m=>m&&!/^\[|^à décrire/.test(m[2])).map(m=>({n:m[1],desc:m[2].replace(/\.$/,'')}))}
+function fillSheetChars(){
+ const sel=$('sheetChar'),old=sel.value,cs=sceneChars();
+ sel.innerHTML='';cs.forEach(c=>{const o=document.createElement('option');o.value=c.n;o.textContent='Personnage '+c.n+' : '+c.desc.slice(0,40)+'…';sel.appendChild(o)});
+ if(cs.some(c=>c.n===old))sel.value=old;
+}
+function sheetPrompt(){
+ const c=sceneChars().find(x=>x.n===$('sheetChar').value);if(!c)return '';
+ const r=$('render').value,st=r==='shonen'?'STYLE : manga noir et blanc, encre propre, aplats noirs, sans trames de fond.':r==='anime'?'STYLE : anime en couleur, aplats nets, couleurs vives.':'STYLE : illustration de bande dessinée soignée.';
+ return 'PLANCHE DE RÉFÉRENCE DE PERSONNAGE : créer UNE seule image sur fond blanc uni montrant le MÊME personnage en trois vues côte à côte, de la tête aux pieds et à la même échelle : de face, de profil, de dos. Sous ces vues, un gros plan du visage de face.\nPERSONNAGE : '+c.desc+'.\nPOSE : debout, neutre, bras le long du corps, expression calme, éclairage neutre et identique sur toutes les vues.\n'+st+'\nIDENTITÉ VERROUILLÉE : mêmes traits du visage, même coiffure, mêmes signes distinctifs, même tenue et mêmes couleurs sur toutes les vues.\nNE PAS AJOUTER : décor, ombre portée, texte, lettres, légendes, flèches, logo, drapeau, autre personnage, objet non décrit.\nFORMAT : paysage large (16:9).';
+}
+const ckState={};
+function checkItems(){
+ const out=[];
+ sceneChars().forEach(c=>{
+  const p=c.n;out.push({k:'v'+p,label:'Personnage '+p+' : visage, coiffure et corpulence conformes',fix:'rétablir le visage, la coiffure et la corpulence du personnage '+p+' exactement comme décrits'});
+  const m=c.desc.match(/SIGNES DISTINCTIFS TOUJOURS VISIBLES : (.*?), tenue :/);
+  if(m)m[1].split(', ').forEach((sg,i)=>out.push({k:'m'+p+'_'+sg,label:'Personnage '+p+' : '+sg+' bien visible',fix:'rendre bien visible, sur le personnage '+p+' : '+sg}));
+  out.push({k:'t'+p,label:'Personnage '+p+' : tenue et couleurs conformes',fix:'rétablir la tenue et les couleurs du personnage '+p+' exactement comme décrites'});
+ });
+ if(!out.length)return out;
+ out.push({k:'g',label:'Aucun drapeau, nom de pays ou texte parasite dans le décor',fix:'supprimer tout drapeau, tout nom de pays ou de ville et tout texte parasite du décor'});
+ out.push({k:'s',label:'Signature « '+SIGNATURE+' » exacte et présente une seule fois',fix:'écrire exactement « '+SIGNATURE+' » une seule fois, '+$('sigPos').value+' de l\'image, orthographe exacte'});
+ out.push({k:'h',label:'Mains et anatomie corrects',fix:'corriger les mains et l\'anatomie'});
+ out.push({k:'x',label:'Aucun personnage ou objet en trop',fix:'retirer tout personnage ou objet non décrit'});
+ return out;
+}
+function renderChecks(){
+ const box=$('checkList'),items=checkItems();box.innerHTML='';
+ items.forEach(it=>{
+  const l=document.createElement('label');l.className='chk';l.style.display='flex';l.style.margin='4px 0';
+  const i=document.createElement('input');i.type='checkbox';i.checked=!!ckState[it.k];
+  i.onchange=()=>{ckState[it.k]=i.checked;buildFix(items)};
+  l.append(i,document.createTextNode(' '+it.label));box.appendChild(l);
+ });
+ buildFix(items);
+}
+function buildFix(items){
+ if(!items.length){$('fixFinal').value='';return}
+ const bad=items.filter(it=>!ckState[it.k]);
+ $('fixFinal').value=bad.length===items.length&&!Object.values(ckState).some(Boolean)?'':
+  bad.length?'CORRECTION : refais exactement la même image en corrigeant UNIQUEMENT :\n'+bad.map(b=>'- '+b.fix).join('\n')+'\nNe change rien d\'autre : mêmes personnages, même composition, même décor, même style.':'Tout est conforme : garde cette image.';
+}
+function refreshSheet(){fillSheetChars();$('sheetFinal').value=sheetPrompt();renderChecks()}
+$('sheetChar').addEventListener('change',()=>{$('sheetFinal').value=sheetPrompt()});
+$('sheetCopy').onclick=()=>copyThen($('sheetFinal').value,null);
+$('sheetGpt').onclick=()=>copyThen($('sheetFinal').value,'https://chatgpt.com/');
+$('sheetMeta').onclick=()=>copyThen($('sheetFinal').value,'https://www.meta.ai/');
+$('fixCopy').onclick=()=>{if(!$('fixFinal').value){alert('Coche d\'abord ce qui est correct.');return}copyThen($('fixFinal').value,null)};
+
 renderPriv();refresh();
 </script>
 </body>

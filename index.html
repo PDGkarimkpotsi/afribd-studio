@@ -69,6 +69,11 @@ body.lite *{box-shadow:none!important;transition:none!important;animation:none!i
 body.lite header{background:var(--green)}
 body.lite .primary{background:var(--orange)}
 @media(max-width:560px){.row{grid-template-columns:1fr}header{padding:18px 14px}main{padding:0 10px 28px}.card{padding:14px}.logo{width:58px;height:58px}}
+.note{font-size:.82rem;color:#35514a;margin:4px 0 8px}
+.fiche{border:2px dashed #b9d6c5;border-radius:12px;padding:10px;margin:10px 0;background:#f3fbf6}
+.marks{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0 10px}
+.marks label{display:flex;align-items:center;gap:6px;font-size:.78rem;margin:0;padding:7px 8px;border:1px solid #cfe0d5;border-radius:10px;background:#fff;font-weight:600}
+.marks label.on{background:#ffe9d6;border-color:var(--orange,#ff6b2c)}
 </style>
 </head>
 <body>
@@ -128,6 +133,37 @@ body.lite .primary{background:var(--orange)}
         <div><label for="cHair">Coiffure</label><select id="cHair"></select></div>
         <div><label for="cOutfit">Tenue</label><select id="cOutfit"></select></div>
       </div>
+      <div class="note" id="costBanner" hidden style="background:#fff4ea;border:2px solid #ff6b2c;border-radius:10px;padding:8px"><b>Mode changement de costume</b> : le visage, la coiffure, le corps et les signes distinctifs sont verrouillés. Seuls la tenue et le costume changent. <button type="button" id="costCancel" class="danger">Annuler</button></div>
+      <div class="fiche" id="fiche">
+        <p class="note"><b>Fiche de traits fixes</b> : ces choix sont repris à l'identique dans chaque scène pour garder le même personnage.</p>
+        <div class="row">
+          <div><label for="cFace">Forme du visage</label><select id="cFace"></select></div>
+          <div><label for="cEyes">Yeux</label><select id="cEyes"></select></div>
+        </div>
+        <div class="row">
+          <div><label for="cNose">Nez</label><select id="cNose"></select></div>
+          <div><label for="cLips">Lèvres</label><select id="cLips"></select></div>
+        </div>
+        <div class="row">
+          <div><label for="cBuild">Corpulence</label><select id="cBuild"></select></div>
+          <div><label for="cHeight">Taille</label><select id="cHeight"></select></div>
+        </div>
+        <label>Signes distinctifs visibles (3 maximum)</label>
+        <div class="marks" id="cMarks"></div>
+        <p class="note"><b>Costume par pièces</b> (en plus de la tenue de base choisie plus haut)</p>
+        <div class="row">
+          <div><label for="cHat">Couvre-chef</label><select id="cHat"></select></div>
+          <div><label for="cShoes">Chaussures</label><select id="cShoes"></select></div>
+        </div>
+        <div class="row">
+          <div><label for="cProp">Objet porté ou tenu</label><select id="cProp"></select></div>
+          <div><label for="cPattern">Motif du tissu</label><select id="cPattern"></select></div>
+        </div>
+        <div class="row">
+          <div><label for="cCol1">Couleur principale</label><select id="cCol1"></select></div>
+          <div><label for="cCol2">Couleur secondaire</label><select id="cCol2"></select></div>
+        </div>
+      </div>
       <label for="cAcc">Accessoires (facultatif)</label>
       <input id="cAcc" placeholder="Ex. lunettes rondes, sac en bandoulière, bijoux en perles">
       <label for="cTrait">Caractère ou détails (facultatif)</label>
@@ -139,6 +175,17 @@ body.lite .primary{background:var(--orange)}
 
   <section class="card">
     <h2>3. Construire la scène</h2>
+    <div class="row">
+      <div><label for="lieu">Ville ou quartier (facultatif)</label><select id="lieu"></select></div>
+      <div id="lieuLibreBox" hidden><label for="lieuLibre">Le lieu, tel qu'on le voit</label><input id="lieuLibre" maxlength="200" placeholder="Ex. rue de terre rouge, maisons basses ocre, manguiers"></div>
+    </div>
+    <div class="row">
+      <div><label for="rue">Rue ou adresse fictive (facultatif)</label><select id="rue"></select></div>
+      <div id="rueLibreBox" hidden><label for="rueLibre">Nom de la rue</label><input id="rueLibre" maxlength="60" placeholder="Ex. Rue du Faucon"></div>
+    </div>
+    <label class="chk"><input type="checkbox" id="rueHint" checked> Ajouter un indice visuel de la rue à l'image (sans écrire son nom)</label>
+    <p class="small" style="margin-top:0">Noms fictifs : toute ressemblance avec une adresse réelle serait fortuite. Le nom de la rue reste dans ton carnet et peut s'écrire proprement dans l'image avec la légende de NOUTALA ZONE.</p>
+    <p class="small" style="margin-top:0">Le nom du lieu reste dans ton carnet : seule sa description visuelle est envoyée au générateur. Descriptions générales, non vérifiées sur place : corrige-les avec « Autre lieu » si besoin.</p>
     <div class="row">
       <div><label for="setting">Décor</label><select id="setting"></select></div>
       <div><label for="sceneType">Type de scène</label><select id="sceneType">
@@ -222,6 +269,10 @@ body.lite .primary{background:var(--orange)}
     <textarea id="action" placeholder="Ex. Kossi parle avec Ama devant une petite boutique. Ama semble inquiète, Kossi essaie de la rassurer."></textarea>
     <label for="dialogue">Dialogue éventuel (facultatif)</label>
     <textarea id="dialogue" style="min-height:68px" placeholder="Ama : Tu as entendu la nouvelle ?&#10;Kossi : Oui, il faut en parler aux autres."></textarea>
+    <label for="dlgMode">Dialogues dans l'image</label>
+    <select id="dlgMode"><option value="vide" selected>Bulles vides à remplir plus tard (recommandé, lettres plus fiables)</option><option value="image">Répliques écrites dans l'image par le générateur</option></select>
+    <label for="signText">Enseigne lisible dans le décor (facultatif, un mot court)</label>
+    <input id="signText" maxlength="20" placeholder="Ex. PHARMACIE">
     <label for="notes">Détails à préserver (facultatif)</label>
     <input id="notes" placeholder="Ex. même t-shirt jaune, fin d'après-midi, moto rouge à gauche">
     <div class="buttons"><button class="primary" id="generate">Préparer le prompt</button><button class="secondary" id="reset">Réinitialiser</button></div>
@@ -323,67 +374,67 @@ $('logoReset').onclick=()=>{try{localStorage.removeItem(LOGO_KEY)}catch(e){}show
    Pour ajouter un pays, copier une entrée et l'ajouter aussi dans GROUPES. */
 const PAYS={
  togo:{nom:'Togo',ville:'Lomé',
-  m:['Kossi','Komla','Yao','Edem','Koffi','Kodjo'],f:['Ama','Afi','Akouvi','Mawuena','Abla','Dzifa'],
+  m:['Kossi','Komla','Yao','Edem','Koffi','Kodjo','Mawuli','Selom','Kokou','Agbéko','Senyo','Komi','Kwami','Yawo'],f:['Ama','Afi','Akouvi','Mawuena','Abla','Dzifa','Essi','Enyonam','Adjovi','Sika','Eyram','Kafui','Mawussi','Ayélé'],
   tenue:{h:'chemise en tissu wax et pantalon',f:'ensemble kaba et pagne en tissu wax coloré',fete:'tenue de cérémonie en tissu kenté tissé aux couleurs vives, drapée avec élégance'},
   decors:['Rue d’un quartier populaire de Lomé, Togo','Plage bordée de cocotiers près de Lomé','Marché animé de quartier à Lomé','Village du nord du Togo aux maisons de terre'],
   combat:{nom:'Evala',desc:'lutte traditionnelle des jeunes Kabyè de la région de Kara, en tenue traditionnelle de lutteur, dans une arène de village devant la foule'}},
  benin:{nom:'Bénin',ville:'Cotonou',
-  m:['Dossou','Codjo','Comlan','Sèdjro','Fiacre','Hounkpatin'],f:['Fifamè','Sènami','Afiavi','Houéfa','Gisèle','Rosine'],
+  m:['Dossou','Codjo','Comlan','Sèdjro','Fiacre','Hounkpatin','Sourou','Agossou','Dènagan','Adébayo','Babatounde','Hervé','Orphée','Ezéchiel'],f:['Fifamè','Sènami','Afiavi','Houéfa','Gisèle','Rosine','Chantal','Judith','Nadège','Rékia','Mariam','Titilayo','Bénédicte','Odile'],
   tenue:{h:'chemise ou boubou en tissu wax',f:'ensemble pagne et haut en tissu wax',fete:'tenue de cérémonie en pagne wax brodé aux motifs élégants'},
   decors:['Rue animée de Cotonou avec des zémidjans (taxis-motos)','Grand marché de Dantokpa, Cotonou','Village lacustre de Ganvié sur pilotis'],combat:null},
  ghana:{nom:'Ghana',ville:'Accra',
-  m:['Kwame','Kofi','Kwesi','Yaw','Kojo','Kwabena'],f:['Ama','Akosua','Abena','Esi','Adwoa','Efua'],
+  m:['Kwame','Kofi','Kwesi','Yaw','Kojo','Kwabena','Kwaku','Kwadwo','Fiifi','Kobina','Ekow','Nii','Papa','Selorm'],f:['Ama','Akosua','Abena','Esi','Adwoa','Efua','Yaa','Afua','Akua','Naa','Maame','Araba','Ewurama','Dede'],
   tenue:{h:'chemise en tissu wax ou smock (fugu) et pantalon',f:'kaba et slit : haut ajusté et jupe longue en tissu wax',fete:'tenue de cérémonie en tissu kente tissé aux motifs géométriques colorés'},
   decors:['Rue d’un quartier d’Accra avec des tro-tros (minibus)','Marché animé d’Accra','Plage de pêcheurs avec pirogues près d’Accra'],combat:null},
  nigeria:{nom:'Nigéria',ville:'Lagos',
-  m:['Chinedu','Tunde','Emeka','Ibrahim','Segun','Yusuf'],f:['Ngozi','Amina','Funmi','Chioma','Aisha','Bisi'],
+  m:['Chinedu','Tunde','Emeka','Ibrahim','Segun','Yusuf','Obinna','Olumide','Musa','Chukwuma','Adebayo','Ikenna','Uche','Danjuma'],f:['Ngozi','Amina','Funmi','Chioma','Aisha','Bisi','Nneka','Folake','Hauwa','Adaeze','Yetunde','Zainab','Ifeoma','Amaka'],
   tenue:{h:'chemise ankara et pantalon',f:'robe ankara ou buba et iro',fete:'agbada brodé pour les hommes, ou buba et iro avec un gele (foulard de tête) élaboré pour les femmes'},
   decors:['Rue animée de Lagos avec des danfos (minibus jaunes)','Marché animé du Nigéria','Ville du nord aux murs décorés de motifs haoussa'],
   combat:{nom:'Dambe',desc:'boxe traditionnelle haoussa, poing enveloppé de bandelettes, devant un cercle de spectateurs'}},
  senegal:{nom:'Sénégal',ville:'Dakar',
-  m:['Mamadou','Ousmane','Cheikh','Moussa','Ibrahima','Abdou'],f:['Aminata','Fatou','Awa','Khady','Mariama','Ndeye'],
+  m:['Mamadou','Ousmane','Cheikh','Moussa','Ibrahima','Abdou','Babacar','Samba','Modou','Pape','Lamine','Mbaye','Alioune','Assane'],f:['Aminata','Fatou','Awa','Khady','Mariama','Ndeye','Coumba','Sokhna','Binta','Dieynaba','Rokhaya','Astou','Mame','Aïda'],
   tenue:{h:'boubou ou tunique brodée et pantalon',f:'boubou coloré avec foulard assorti',fete:'grand boubou brodé de cérémonie'},
   decors:['Rue de Dakar avec des cars rapides colorés','Plage de pêcheurs avec pirogues colorées près de Dakar','Marché animé de Dakar'],
   combat:{nom:'Laamb',desc:'lutte sénégalaise dans une grande arène, lutteurs en pagne et gris-gris, foule en liesse, tambours'}},
  mali:{nom:'Mali',ville:'Bamako',
-  m:['Moussa','Seydou','Amadou','Modibo','Bakary','Sékou'],f:['Fanta','Awa','Aïssata','Mariam','Kadiatou','Oumou'],
+  m:['Moussa','Seydou','Amadou','Modibo','Bakary','Sékou','Boubacar','Drissa','Lassana','Mahamadou','Souleymane','Tiéman','Brehima','Fousseyni'],f:['Fanta','Awa','Aïssata','Mariam','Kadiatou','Oumou','Djénéba','Bintou','Assétou','Rokia','Maïmouna','Salimata','Korotoumou','Hawa'],
   tenue:{h:'boubou ou tunique en tissu bogolan',f:'boubou ou pagne avec foulard noué',fete:'bazin riche brodé ou tenue en bogolan (tissu teint à la boue)'},
   decors:['Rue de Bamako au bord du fleuve Niger','Ville de Djenné et sa grande mosquée en terre','Marché animé de Bamako'],combat:null},
  civ:{nom:'Côte d’Ivoire',ville:'Abidjan',
-  m:['Kouassi','Yao','Konan','Ibrahim','Serge','Adama'],f:['Akissi','Aya','Adjoua','Affoué','Fatou','Awa'],
+  m:['Kouassi','Yao','Konan','Ibrahim','Serge','Adama','Kouadio','Koffi','Brou','Séka','Dieudonné','Franck','Yacouba','Lanciné'],f:['Akissi','Aya','Adjoua','Affoué','Fatou','Awa','Amenan','Ahou','Mariam','Habiba','Josiane','Clarisse','Bintou','Kadi'],
   tenue:{h:'chemise en tissu wax et pantalon',f:'ensemble pagne wax et haut ajusté',fete:'tenue de cérémonie en tissu tissé baoulé aux motifs colorés'},
   decors:['Rue d’Abidjan avec des gbakas (minibus)','Bord de la lagune d’Abidjan','Marché animé d’Abidjan'],combat:null},
  burkina:{nom:'Burkina Faso',ville:'Ouagadougou',
-  m:['Ousmane','Issouf','Boukary','Salif','Adama','Moumouni'],f:['Aminata','Fatimata','Awa','Salimata','Pascaline','Rasmata'],
+  m:['Ousmane','Issouf','Boukary','Salif','Adama','Moumouni','Wendyam','Rasmané','Placide','Yacouba','Dramane','Mahamadi','Saïdou','Inoussa'],f:['Aminata','Fatimata','Awa','Salimata','Pascaline','Rasmata','Alimata','Azéta','Habibou','Nafissatou','Ramata','Sidonie','Wendlassida','Odette'],
   tenue:{h:'tunique en Faso Dan Fani (coton tissé) et pantalon',f:'pagne et haut en Faso Dan Fani (coton tissé)',fete:'tenue de cérémonie en Faso Dan Fani aux motifs tissés'},
   decors:['Rue de Ouagadougou avec de nombreuses mobylettes','Cour traditionnelle aux murs peints de motifs géométriques (style Tiébélé)','Marché animé de Ouagadougou'],combat:null},
  cameroun:{nom:'Cameroun',ville:'Douala',
-  m:['Mballa','Etienne','Brice','Hervé','Fotso','Armel'],f:['Mireille','Nadège','Ngono','Estelle','Aïcha','Prisca'],
+  m:['Mballa','Etienne','Brice','Hervé','Fotso','Armel','Ndongo','Tchinda','Kamga','Essomba','Nkeng','Bertrand','Fabrice','Landry'],f:['Mireille','Nadège','Ngono','Estelle','Aïcha','Prisca','Laure','Sandrine','Danielle','Flore','Solange','Carine','Larissa','Ghislaine'],
   tenue:{h:'chemise en tissu wax et pantalon',f:'kaba (robe ample en tissu wax)',fete:'toghu, tenue de cérémonie brodée des hauts plateaux de l’Ouest'},
   decors:['Rue animée de Douala','Marché animé de Yaoundé','Village des hauts plateaux de l’Ouest'],combat:null},
  rdc:{nom:'RD Congo',ville:'Kinshasa',
-  m:['Trésor','Blaise','Patrick','Serge','Junior','Mbuyi'],f:['Grâce','Patience','Espérance','Chantal','Mado','Nzuzi'],
+  m:['Trésor','Blaise','Patrick','Serge','Junior','Mbuyi','Jean-Claude','Kabongo','Ilunga','Ngoy','Kasongo','Mukendi','Pascal','Mwamba'],f:['Grâce','Patience','Espérance','Chantal','Mado','Nzuzi','Bijou','Mireille','Annie','Nadine','Kapinga','Ngalula','Béatrice','Dorcas'],
   tenue:{h:'costume élégant coloré à la manière des sapeurs (la SAPE)',f:'liputa : pagne drapé coloré avec haut assorti',fete:'liputa de fête avec foulard de tête élaboré'},
   decors:['Rue animée de Kinshasa','Bord du fleuve Congo avec pirogues','Marché animé de Kinshasa'],combat:null},
  kenya:{nom:'Kenya',ville:'Nairobi',
-  m:['Kamau','Otieno','Mwangi','Juma','Kiprop','Baraka'],f:['Wanjiru','Akinyi','Njeri','Amina','Chebet','Zawadi'],
+  m:['Kamau','Otieno','Mwangi','Juma','Kiprop','Baraka','Odhiambo','Kariuki','Mutua','Omondi','Kibet','Hassan','Wafula','Kimani'],f:['Wanjiru','Akinyi','Njeri','Amina','Chebet','Zawadi','Atieno','Wambui','Nyambura','Achieng','Mwajuma','Naliaka','Cherono','Halima'],
   tenue:{h:'chemise et kikoi ou pantalon',f:'robe en kitenge ou kanga (tissu imprimé swahili)',fete:'shuka (étoffe à carreaux) et bijoux perlés colorés'},
   decors:['Rue de Nairobi avec des matatus (minibus colorés)','Savane avec acacias, au lever du soleil','Plage de Mombasa avec palmiers'],combat:null},
  ethiopie:{nom:'Éthiopie',ville:'Addis-Abeba',
-  m:['Abebe','Dawit','Tesfaye','Yonas','Kebede','Henok'],f:['Selam','Tigist','Meron','Hana','Almaz','Bethlehem'],
+  m:['Abebe','Dawit','Tesfaye','Yonas','Kebede','Henok','Getachew','Mulugeta','Bereket','Fikadu','Samson','Tadesse','Girma','Lemma'],f:['Selam','Tigist','Meron','Hana','Almaz','Bethlehem','Marta','Rahel','Saba','Birtukan','Aster','Genet','Sosina','Lidya'],
   tenue:{h:'chemise et pantalon, ou tenue blanche traditionnelle',f:'robe moderne ou habesha kemis (robe blanche brodée) avec netela',fete:'habesha kemis brodée de fête'},
   decors:['Rue d’Addis-Abeba','Grand marché Mercato d’Addis-Abeba','Café traditionnel avec cérémonie du café'],combat:null},
  afsud:{nom:'Afrique du Sud',ville:'Johannesburg',
-  m:['Sipho','Thabo','Themba','Lwazi','Bongani','Sizwe'],f:['Nomsa','Thandi','Lerato','Zanele','Naledi','Palesa'],
+  m:['Sipho','Thabo','Themba','Lwazi','Bongani','Sizwe','Sibusiso','Mandla','Tshepo','Kagiso','Siyabonga','Lunga','Nkosana','Mpho'],f:['Nomsa','Thandi','Lerato','Zanele','Naledi','Palesa','Nandi','Ayanda','Zodwa','Lindiwe','Busisiwe','Refilwe','Thuli','Khanyi'],
   tenue:{h:'tenue contemporaine, chemise et pantalon',f:'robe en tissu shweshwe',fete:'tenue traditionnelle perlée de cérémonie'},
   decors:['Quartier animé de township avec des maisons colorées','Marché animé de Johannesburg','Paysage de collines verdoyantes avec village'],
   combat:{nom:'Stick fighting nguni',desc:'combat au bâton traditionnel des jeunes bergers, bâtons de bois, tenue traditionnelle, devant la communauté'}},
  afrique:{nom:'Afrique',label:'Afrique (général)',ville:'une grande ville africaine',
-  m:['Kofi','Amadou','Tunde','Baraka','Sipho','Moussa'],f:['Ama','Aïcha','Zuri','Nia','Fatou','Thandi'],
+  m:['Kofi','Amadou','Tunde','Baraka','Sipho','Moussa','Kwame','Seydou','Jabari','Chike','Obi','Idris','Zuberi','Tariq'],f:['Ama','Aïcha','Zuri','Nia','Fatou','Thandi','Imani','Amara','Safiya','Makena','Nala','Esi','Selam','Zawadi'],
   tenue:{h:'chemise en tissu wax et pantalon',f:'robe ou ensemble en tissu wax coloré',fete:'tenue de cérémonie traditionnelle aux motifs africains'},
   decors:['Rue animée d’un quartier populaire africain'],combat:null},
  autre:{nom:'Afrique',label:'Autre pays (je précise)',ville:'une ville de ce pays',
-  m:['Kofi','Amadou','Tunde','Baraka','Sipho','Moussa'],f:['Ama','Aïcha','Zuri','Nia','Fatou','Thandi'],
+  m:['Kofi','Amadou','Tunde','Baraka','Sipho','Moussa','Kwame','Seydou','Jabari','Chike','Obi','Idris','Zuberi','Tariq'],f:['Ama','Aïcha','Zuri','Nia','Fatou','Thandi','Imani','Amara','Safiya','Makena','Nala','Esi','Selam','Zawadi'],
   tenue:{h:'chemise et pantalon',f:'robe ou ensemble coloré',fete:'tenue de cérémonie traditionnelle du pays'},
   decors:[],combat:null}
 };
@@ -408,7 +459,21 @@ const ARCH=[
  {id:'mamie',lab:'grand-mère',age:70,s:'f',coif:'cheveux blancs sous un foulard',role:'grand-mère bienveillante et pleine de sagesse',tn:'fete'},
  {id:'prof',lab:'enseignant',age:36,s:'m',coif:'cheveux courts, petites lunettes',role:'maître d’école dévoué',tn:'h'},
  {id:'lut',lab:'lutteur',age:26,s:'m',coif:'crâne rasé, silhouette athlétique et musclée',role:'combattant déterminé',tn:'h'},
- {id:'comb',lab:'combattante',age:27,s:'f',coif:'tresses attachées en queue pour le combat',role:'athlète combattante agile et courageuse',tn:'f'}
+ {id:'comb',lab:'combattante',age:27,s:'f',coif:'tresses attachées en queue pour le combat',role:'athlète combattante agile et courageuse',tn:'f'},
+ {id:'bebm',lab:'tout-petit garçon',age:5,s:'m',coif:'cheveux ras, joues rondes',role:'petit curieux qui suit toujours sa grande sœur',tn:'h'},
+ {id:'bebf',lab:'tout-petite fille',age:5,s:'f',coif:'deux petites couettes',role:'petite rieuse qui danse partout',tn:'f'},
+ {id:'pmin',lab:'préadolescent',age:12,s:'m',coif:'cheveux courts, petite coupe géométrique',role:'écolier inventeur qui bricole des jouets',tn:'h'},
+ {id:'pmif',lab:'préadolescente',age:12,s:'f',coif:'nattes collées fines',role:'écolière chef de bande, courageuse',tn:'f'},
+ {id:'griot',lab:'griot musicien',age:46,s:'m',coif:'cheveux courts, bonnet traditionnel',role:'griot qui chante l’histoire du village avec son instrument',tn:'fete'},
+ {id:'soig',lab:'soignante',age:34,s:'f',coif:'cheveux tressés relevés',role:'infirmière du dispensaire, calme et dévouée',tn:'f'},
+ {id:'berg',lab:'berger éleveur',age:31,s:'m',coif:'cheveux courts, chapeau de paille',role:'éleveur qui conduit son troupeau',tn:'h'},
+ {id:'cult',lab:'cultivatrice',age:36,s:'f',coif:'foulard noué contre le soleil',role:'cultivatrice travailleuse du champ familial',tn:'f'},
+ {id:'pech',lab:'pêcheur',age:38,s:'m',coif:'crâne rasé, peau marquée par le soleil',role:'pêcheur qui connaît les eaux et les vents',tn:'h'},
+ {id:'tiss',lab:'tisserande',age:52,s:'f',coif:'foulard coloré',role:'tisserande et potière qui transmet son art',tn:'f'},
+ {id:'forg',lab:'forgeron',age:48,s:'m',coif:'crâne rasé, bras puissants',role:'forgeron respecté qui façonne le fer',tn:'h'},
+ {id:'dans',lab:'danseuse',age:22,s:'f',coif:'tresses ornées de perles',role:'danseuse traditionnelle pleine d’énergie',tn:'fete'},
+ {id:'chef',lab:'chef de village',age:62,s:'m',coif:'cheveux gris courts, barbe taillée',role:'chef du village, juste et écouté',tn:'fete'},
+ {id:'reine',lab:'reine mère',age:60,s:'f',coif:'coiffure haute ornée',role:'reine mère, gardienne des traditions et des conseils',tn:'fete'}
 ];
 const PEAUX=['peau noire profonde','peau brun foncé','peau ébène','peau brun chocolat'];
 const TEINTS=[['peau noire profonde','Noir profond'],['peau très foncée','Très foncé'],['peau brun foncé','Brun foncé'],['peau brun chocolat','Brun chocolat'],['peau brun clair','Brun clair'],['peau claire','Clair']];
@@ -505,7 +570,13 @@ const FANT=[
  {id:'fhm',lab:'héros réincarné',age:17,s:'m',coif:'cheveux courts, regard calme',role:'héros revenu d’une ère lointaine, puissant mais discret',tn:'h',sug:{voie:'ancien',elem:'ombre',arme:'epee_e',cercle:'multi'}},
  {id:'fhf',lab:'héroïne réincarnée',age:17,s:'f',coif:'tresses longues',role:'héroïne revenue d’une ère lointaine, puissante mais discrète',tn:'f',sug:{voie:'ancien',elem:'foudre',arme:'epee',cercle:'huit'}},
  {id:'fpm',lab:'professeur de magie',age:34,s:'m',coif:'cheveux courts en désordre',role:'professeur de magie négligé qui annule les sorts d’un geste',tn:'h',sug:{voie:'annul',elem:'pur',arme:'pistolet',cercle:'main'}},
- {id:'fpf',lab:'professeure de magie',age:33,s:'f',coif:'afro naturel',role:'professeure de magie excentrique, experte en contre-sorts',tn:'f',sug:{voie:'annul',elem:'lumiere',arme:'bouclier_epee',cercle:'double'}}
+ {id:'fpf',lab:'professeure de magie',age:33,s:'f',coif:'afro naturel',role:'professeure de magie excentrique, experte en contre-sorts',tn:'f',sug:{voie:'annul',elem:'lumiere',arme:'bouclier_epee',cercle:'double'}},
+ {id:'fcm',lab:'chasseur de monstres',age:30,s:'m',coif:'cheveux courts, cicatrice sur la joue',role:'traqueur de créatures sacrées, patient et précis',tn:'h',sug:{voie:'corps',elem:'terre',arme:'arc',cercle:'aucun'}},
+ {id:'fcf',lab:'chasseuse de monstres',age:29,s:'f',coif:'tresses attachées, bandeau',role:'traqueuse de créatures, rapide et silencieuse',tn:'f',sug:{voie:'corps',elem:'vent',arme:'lance_bouclier',cercle:'sol'}},
+ {id:'ffm',lab:'forgeron enchanteur',age:44,s:'m',coif:'crâne rasé, bras puissants',role:'forgeron qui grave des sceaux de pouvoir dans le métal',tn:'h',sug:{voie:'sceaux',elem:'feu',arme:'masse',cercle:'simple'}},
+ {id:'fff',lab:'forgeronne enchanteuse',age:42,s:'f',coif:'foulard noué, mèches tressées',role:'forgeronne qui grave des sceaux de pouvoir dans le métal',tn:'f',sug:{voie:'sceaux',elem:'terre',arme:'faux',cercle:'huit'}},
+ {id:'fim',lab:'illusionniste',age:25,s:'m',coif:'locks courts',role:'illusionniste malin qui trompe les regards',tn:'h',sug:{voie:'illusion',elem:'glace',arme:'aucune',cercle:'double'}},
+ {id:'fif',lab:'illusionniste',age:24,s:'f',coif:'afro naturel orné',role:'illusionniste rêveuse qui fait naître des mirages',tn:'f',sug:{voie:'illusion',elem:'lumiere',arme:'fils',cercle:'ciel'}}
 ];
 function presetsFant(c){
  let im=3,iff=3;
@@ -565,8 +636,15 @@ const FDEC={
  afrique:{r:'ruines d’une ancienne cité africaine, murs de terre et de pierre envahis par la végétation',f:'forêt sacrée aux arbres immenses et aux sentiers anciens',a:'arène de pierre en lévitation au-dessus d’un grand fleuve'}
 };
 function shortTxt(t){return t.split(',')[0].split(' (')[0]}
+$('lieu').addEventListener('change',syncLieu);
+$('rue').addEventListener('change',syncRue);
 function syncDecor(){$('decorLibreBox').hidden=$('setting').value!=='libre'}
-function decorText(){return $('setting').value==='libre'?($('decorLibre').value.trim()||'[décor culturel à décrire]'):$('setting').value}
+function decorText(){
+ const v=$('setting').value;
+ if(v==='libre')return $('decorLibre').value.trim()||'[décor culturel à décrire]';
+ if(v==='auto'){const l=cadresFor(countryKey()).map(x=>x.value).filter(x=>x!==lastAutoCadre);lastAutoCadre=l[Math.floor(Math.random()*l.length)];return lastAutoCadre}
+ return v;
+}
 function stash(){
  if(!$('prompt').value)$('prompt').value=makePrompt();
  try{localStorage.setItem('afribd_last_prompt',$('prompt').value);localStorage.setItem('afribd_last_dialogue',$('dialogue').value)}catch(e){}
@@ -606,9 +684,78 @@ function setOptions(sel,groups){
 function fillCountries(){
  setOptions($('country'),GROUPES.map(g=>({label:g[0],items:g[1].map(k=>({value:k,text:PAYS[k].label||PAYS[k].nom}))})));
 }
+
+const CADRE_ATTR={
+ togo:{bati:'maisons basses en béton peint aux tons ocre et pastel, toits de tôle ondulée',sol:'terre rouge latéritique',veg:'manguiers et cocotiers',eau:'plage de sable clair bordée de cocotiers, pirogues de pêcheurs tirées sur le sable',ext:'motos-taxis garées le long des murs'},
+ benin:{bati:'maisons basses en béton et tôle, murs peints de couleurs vives',sol:'terre rouge',veg:'palmiers à huile et manguiers',eau:'rive de lagune avec pirogues et filets de pêche',ext:'motos-taxis aux chemises jaunes'},
+ ghana:{bati:'maisons basses en béton peint et étals de bois peints',sol:'terre rouge',veg:'palmiers et manguiers',eau:'plage atlantique avec pirogues de pêche peintes',ext:'minibus colorés et peints'},
+ nigeria:{bati:'immeubles modernes mêlés à des toits de tôle',sol:'terre battue et asphalte',veg:'palmiers et grands arbres',eau:'rive de lagune animée avec bateaux et pirogues',ext:'bus jaunes et motos'},
+ senegal:{bati:'murs ocre et bleus, maisons basses',sol:'sable clair',veg:'baobabs et cocotiers',eau:'plage de pêcheurs avec grandes pirogues peintes de couleurs vives',ext:'minibus décorés très colorés'},
+ mali:{bati:'maisons en terre crue aux poutres de bois saillantes, tons ocre',sol:'terre ocre et sable',veg:'karités et acacias',eau:'berge d’un grand fleuve avec pirogues allongées',ext:'charrettes à âne et vélos'},
+ civ:{bati:'maisons colorées et immeubles modernes au loin',sol:'terre rouge',veg:'palmiers, bananiers et cocotiers',eau:'rive de lagune bordée de palmiers, avec pirogues',ext:'petits taxis colorés et minibus'},
+ burkina:{bati:'cases rondes aux murs peints de motifs géométriques noir, blanc et ocre, et maisons basses en terre',sol:'terre rouge sèche',veg:'karités et grands arbres de savane',eau:'mare bordée de roseaux avec des lavandières',ext:'vélos et mobylettes'},
+ cameroun:{bati:'maisons en béton et tôle sur des pentes vertes',sol:'terre rouge',veg:'bananiers et forêt tropicale',eau:'rive de fleuve avec pirogues',ext:'taxis jaunes et motos'},
+ rdc:{bati:'maisons basses colorées aux murs peints',sol:'terre rouge',veg:'forêt dense et palmiers',eau:'berge d’un très large fleuve avec pirogues chargées',ext:'vélos chargés et minibus colorés'},
+ kenya:{bati:'maisons basses en béton aux murs peints et toits de tôle',sol:'terre rouge',veg:'acacias et manguiers',eau:'rive d’un grand lac avec petits bateaux de pêche',ext:'minibus peints très colorés'},
+ ethiopie:{bati:'maisons rondes en pierre ou en terre à toit de chaume, et petits immeubles',sol:'terre sèche des hauts plateaux',veg:'eucalyptus',eau:'berge d’un lac avec petits bateaux en roseaux',ext:'ânes chargés et minibus bleus et blancs'},
+ afsud:{bati:'maisons basses colorées et petits immeubles',sol:'terre sèche',veg:'acacias et aloès',eau:'côte rocheuse battue par les vagues',ext:'minibus-taxis blancs'},
+ afrique:{bati:'maisons basses en béton et en terre',sol:'terre rouge',veg:'grands arbres et palmiers',eau:'rive de fleuve avec pirogues',ext:'motos et vélos'}
+};
+const CADRE_EXTRA={
+ togo:[['🧵 Marché de pagnes','Marché de pagnes : étals de tissus wax aux motifs éclatants, vendeuses élégantes, parasols colorés'],['🥭 Chemin de brousse','Chemin de terre rouge bordé de manguiers, enfants en uniforme qui rentrent de l’école']],
+ benin:[['🛶 Village lacustre','Village lacustre : maisons en bois et chaume sur pilotis au-dessus de l’eau, pirogues amarrées'],['🎣 Quai de pêcheurs','Quai de pêcheurs : filets qui sèchent, pirogues alignées, poissons étalés sur des nattes']],
+ ghana:[['🧶 Atelier de tissage','Atelier de tissage : métiers à tisser étroits, fils très colorés, tisserands concentrés'],['🚌 Arrêt de minibus','Arrêt de minibus coloré : passagers qui attendent, vendeurs ambulants avec des plateaux sur la tête']]
+};
+let lastAutoCadre='';
+function cadresFor(k){
+ const a=CADRE_ATTR[k]||CADRE_ATTR.afrique;
+ const l=[
+  ['🛒 Marché de quartier','Marché de quartier animé : étals sous des parasols et des bâches colorées, piles de fruits et de tissus, vendeuses et clients, '+a.bati+' en arrière-plan, '+a.sol+' sous les pieds'],
+  ['🏫 Cour d’école','Cour d’école primaire : bâtiment bas aux murs peints, grand arbre ('+a.veg+') qui donne de l’ombre, élèves en uniforme, '+a.sol],
+  ['🏘️ Ruelle','Ruelle étroite entre '+a.bati+', linge qui sèche, '+a.ext],
+  ['🌊 Bord de l’eau','Bord de l’eau : '+a.eau],
+  ['🔨 Atelier d’artisan','Atelier d’artisan à ciel ouvert : artisan au travail, outils accrochés aux murs, '+a.bati+' autour'],
+  ['🚦 Carrefour animé','Carrefour animé : '+a.ext+', passants, boutiques colorées, '+a.bati],
+  ['🏡 Cour de maison familiale','Cour intérieure d’une maison familiale : '+a.bati+', grand arbre ('+a.veg+'), marmite sur le feu, enfants qui jouent'],
+  ['🌳 Place centrale','Place centrale ombragée par un grand arbre ('+a.veg+'), jeunes qui discutent, '+a.bati],
+  ['⚽ Terrain de football','Terrain de football de quartier en '+a.sol+', buts de fortune, spectateurs, '+a.bati+' en arrière-plan'],
+  ['📚 Salle de classe','Salle de classe simple : bancs en bois, tableau noir, lumière naturelle par les fenêtres, vue sur '+a.veg]
+ ];
+ (CADRE_EXTRA[k]||[]).forEach(e=>l.push(e));
+ return l.map(x=>({text:x[0],value:x[1]}));
+}
+const LIEUX={"togo": [["Lomé", "capitale côtière", "Immeubles de béton clair et façades ocre aux toits de tôle ondulée, avenues larges bordées de palmiers, nuées de motos-taxis, étals de marché colorés, plage de sable proche et grues d'un port industriel."], ["Kara", "ville du nord", "Ville étalée de maisons basses en parpaings enduits de ciment, toits de tôle rouillée, rues de latérite rouge, collines boisées à l'horizon, motos et vélos nombreux, manguiers et karités ombrageant les cours."], ["Togoville (lac Togo)", "village lacustre", "Rives plates d'une lagune calme bordée de cocotiers, pirogues en bois étroites chargées de filets, cases aux murs de terre ocre et toits de tôle ou de chaume, sentiers de sable et petits embarcadères."], ["Sokodé", "deuxième ville, intérieur", "Ville moyenne d'intérieur aux maisons basses en parpaings et briques de terre, toits de tôle, routes en latérite poussiéreuse, motos omniprésentes, grands arbres d'ombrage, collines boisées et marché animé sous auvents."], ["Koutammakou (nord-est)", "zone rurale traditionnelle", "Maisons-tours en terre crue à deux niveaux, aux toits de chaume coniques, petits greniers ronds assortis, murs ocre à brun-rouge, champs de sorgho et de mil entre arbres épars sur terrain légèrement vallonné."]], "benin": [["Cotonou", "capitale économique côtière", "Ville plate de béton et de tôle entre mer et lagune, immeubles ocre et blancs, ponts, boulevards saturés de motos-taxis à chemises jaunes, marché dense d'étals sous parasols, palmiers et sable proche."], ["Natitingou", "ville du nord-ouest", "Petite ville adossée à des collines rocheuses, maisons basses en briques de terre et parpaings, toits de tôle, rues de terre rouge, motos, manguiers, marché, champs de maïs et d'igname sur pentes."], ["Ganvié (lac Nokoué)", "village lacustre sur pilotis", "Village sur un lac peu profond, cases en bois et nattes sur pilotis, toits de chaume ou tôle, longues pirogues à perche ou voile, pêcheurs, marchandes en pirogue, enclos de branchages dans l'eau."], ["Ouidah", "ville côtière historique", "Petite ville côtière aux maisons basses d'époque coloniale, murs pastel ou ocre écaillés, toits de tuiles ou tôle, rues sablonneuses, palmiers à huile et cocotiers, grands arbres, plage de sable proche."], ["Parakou", "deuxième grande ville, nord", "Grande ville de plaine aux rues larges et poussiéreuses, immeubles bas de béton, toits de tôle, nuée de motos, camions de fret, grand marché couvert d'étals, arbres d'ombrage et terre rouge."], ["Boukombé (pays otammari)", "zone rurale traditionnelle", "Maisons-forteresses en terre crue aux petites tourelles, toits plats ou chaume conique, greniers en forme de pots, murs ocre-gris, champs de mil sur collines rocailleuses."]], "ghana": [["Accra", "capitale côtière", "Métropole côtière mêlant tours de verre, immeubles de béton, quartiers bas en parpaings et tôle, minibus collectifs colorés, carrefours embouteillés, étals sur trottoirs, palmiers, ciel humide et brise côtière."], ["Tamale", "ville du nord", "Ville de plaine très plate, maisons basses de parpaings et de briques de terre, toits de tôle, rues poussiéreuses encombrées de motos, arbres de karité et de neem, murs ocres parfois ornés de motifs."], ["Nzulezo (lac Tadane)", "village lacustre sur pilotis", "Village de cases sur pilotis au milieu d'un lac bordé de forêt humide, maisons de bois et feuilles de raphia, plancher et passerelle de planches, pirogues creusées, palmiers et roseaux."], ["Cape Coast", "ville côtière historique", "Ville côtière dominée par un fort massif blanchi à la chaux aux bastions carrés, maisons coloniales basses, toits de tôle, pirogues de pêche colorées sur le sable, collines vertes, rues en pente."], ["Kumasi", "deuxième grande ville, intérieur forestier", "Grande ville de collines et de sol rouge, immeubles de béton aux toits de tôle, vaste marché dense d'étals et de parasols, rues très animées de minibus, végétation verte luxuriante, talus de terre rouge."], ["Village traditionnel ashanti", "zone rurale traditionnelle", "Village de cours aux murs en terre lissée, partie basse rouge et haut blanchi, motifs en relief, toits de chaume ou tôle à forte pente, forêt dense et cacaoyers autour."]], "nigeria": [["Lagos", "mégapole lagunaire", "Immeubles de bureaux en verre et béton dominant des quartiers denses de maisons basses en parpaings peints, toits de tôle ondulée rouillée, routes saturées de minibus jaunes, fils électriques emmêlés, lagune brune bordée de palmiers et de pontons."], ["Kano", "ville du nord, cité haoussa", "Maisons à toit plat en briques de terre ocre rosé, façades ornées de reliefs géométriques en creux, ruelles sablonneuses étroites, remparts de terre crénelés, rares acacias, ciel poussiéreux de saison sèche, motos et charrettes à âne."], ["Ibadan", "deuxième grande ville", "Mer continue de toits en tôle ondulée rouillée sur des collines basses, maisons de ciment aux murs délavés, routes poussiéreuses bordées de caniveaux, palmiers, manguiers, panneaux peints à la main, minibus et motos."]], "senegal": [["Dakar", "capitale côtière", "Presqu'île urbaine aux immeubles de béton blanchis et ocre de plusieurs étages, falaises basaltiques sombres côté océan, avenues larges, bus colorés, murs peints de fresques, sable clair sur les trottoirs, mer bleu-gris."], ["Saint-Louis", "ville fluviale coloniale", "Maisons de ville à étages aux façades pastel écaillées, balcons en bois et fer forgé, volets persiennes, toits-terrasses, quais le long d'un fleuve large, pirogues multicolores alignées sur une langue de sable, rues droites."], ["Île de Gorée", "île historique", "Petite île aux ruelles de sable étroites sans voiture, maisons basses ocre, rouge brique et rose avec escaliers extérieurs, bougainvilliers retombants, murs de pierre basaltique, petite plage, vue sur une grande ville au loin."], ["Delta du Saloum", "zone rurale, delta et mangrove", "Village de cases rondes ou rectangulaires en banco au toit de chaume ou de tôle, cour sableuse clôturée de nattes, bolongs d'eau salée bordés de palétuviers, tas de coquillages blancs, baobabs et palmiers rôniers."]], "mali": [["Bamako", "capitale fluviale", "Ville étalée sur les rives d'un grand fleuve, maisons basses en parpaings enduits ocre et toits de tôle, manguiers majestueux, rues de terre rouge, motos nombreuses, collines rocheuses en arrière-plan, marchés colorés."], ["Tombouctou", "ville saharienne du nord", "Maisons basses en briques de sable beige et ocre, ruelles étroites ensablées, portes en bois cloutées, toits plats, dunes qui envahissent les rues, mosquées de terre aux poutres saillantes, ciel pâle, rares acacias."], ["Mopti", "port fluvial", "Port fluvial au confluent de deux cours d'eau, longues pirogues en bois à voile ou moteur, maisons en banco et en parpaings sur digues, entrepôts de sel et poisson séché, berges boueuses, marché, ciel plat de savane."], ["Djenné", "ville historique en terre crue", "Maisons à étages en brique de terre crue lissée d'enduit beige-brun, façades à pilastres et petites fenêtres en bois, poutres de bois saillantes, ruelles étroites, toits plats à gargouilles, plaine inondable alentour, ânes."], ["Falaise de Bandiagara (pays dogon)", "village de falaise", "Village accroché au pied d'une falaise de grès rouge, maisons carrées en pierre et banco, greniers à toit de chaume pointu, terrasses, abris en paille sur piliers, champs d'oignons en bas, sentiers pierreux."]], "civ": [["Abidjan (Le Plateau)", "capitale économique, centre d'affaires", "Tours de verre et de béton clair dressées au bord d'une lagune brune, larges avenues, ponts routiers, palmiers et arbres tropicaux touffus, trottoirs animés, taxis colorés et ciel souvent voilé d'humidité chaude."], ["Korhogo", "ville du nord, savane", "Maisons basses en terre ocre aux toits de tôle ou de chaume, cours poussiéreuses, sol de latérite rouge, grands karités épars dans une savane arborée, motos garées contre des murs sablonneux."], ["Grand-Bassam", "ville côtière et historique", "Anciennes demeures coloniales à étage avec vérandas en bois et galeries ombragées, peintures écaillées, rues sablonneuses, cocotiers, lagune calme d'un côté et plage battue par les vagues de l'autre."], ["Bouaké", "deuxième ville, carrefour de l'intérieur", "Vaste étendue plate de maisons en parpaings enduits ocre aux toits de tôle ondulée, grand marché couvert, rues de terre rouge, manguiers ombrageant les carrefours, circulation de mototaxis et de camions."]], "burkina": [["Ouagadougou", "capitale, ville de latérite", "Rues larges de terre rouge et d'asphalte poussiéreux, flots de mobylettes, bâtiments bas en béton peints d'ocre ou de blanc, quelques immeubles modernes, neems et flamboyants, ciel clair et lumière dure."], ["Dori", "ville du nord sahélien", "Maisons cubiques en banco couleur sable aux toits plats, clôtures de branches épineuses, sol sableux clair, rares arbres épineux, troupeaux de zébus et de chèvres, ciel blanc de poussière."], ["Vieux quartier de Bobo-Dioulasso", "quartier historique en banco", "Ruelles étroites bordées de murs en terre ocre, maisons cubiques à toit-terrasse, mosquée de boue aux contreforts hérissés de poutres de bois saillantes, sol sableux, petits ruisseaux et manguiers."], ["Bobo-Dioulasso", "deuxième ville, centre moderne", "Avenues bordées de manguiers et de caïlcédrats, vélos et mobylettes en grand nombre, bâtiments bas en béton aux façades pastel, grande gare routière, marché animé, végétation plus verte qu'ailleurs."], ["Tiébélé", "village rural traditionnel décoré", "Concessions de maisons rondes et rectangulaires en terre, murs ornés de motifs géométriques noirs, blancs et rouges, entrées basses, toits plats ou de chaume, cour sablonneuse, champs de mil alentour."]], "cameroun": [["Yaoundé", "capitale sur collines", "Quartiers de parpaings aux toits de tôle étagés sur des collines vertes, routes en pente de terre rouge, immeubles administratifs sobres au centre, taxis jaunes, bananiers et arbres omniprésents sous un ciel nuageux."], ["Maroua", "ville du nord, plaine sèche", "Maisons basses en briques de terre claire aux toits plats ou de tôle, rues sableuses, pics rocheux isolés à l'horizon, neems rabougris, nombreuses motos et bicyclettes, lumière vive et poussière."], ["Kribi", "ville côtière", "Plages de sable clair bordées de cocotiers, forêt dense descendant jusqu'à l'océan, pirogues de pêcheurs tirées au sec, roches sombres, petites maisons en planches et béton aux toits de tôle."], ["Douala", "deuxième ville, grand port", "Grand port sur un estuaire bordé de mangroves, immeubles de béton noircis par l'humidité, larges boulevards embouteillés, taxis jaunes, marchés denses, pluies violentes, flaques sur chaussées et caniveaux ouverts."], ["Village bamiléké de l'Ouest", "village de collines cultivées", "Collines vertes en cultures étagées, maisons en briques de terre rouge séchée aux toits de tôle, cases à toit conique de chaume, haies, bananiers, caféiers et chemins de terre ocre."]], "rdc": [["Kinshasa", "capitale sur grand fleuve", "Immense étendue de maisons basses aux toits de tôle sur des collines sablonneuses, large fleuve brun, tours de bureaux au centre, boulevards bondés de minibus colorés, poussière orange et vendeurs de rue."], ["Kisangani", "ville fluviale de l'intérieur forestier", "Grand fleuve brun aux berges boueuses où glissent des pirogues, bâtiments coloniaux défraîchis à arcades, toits de tôle rouillée, pistes de terre rouge, forêt équatoriale dense et ciel chargé de pluie."], ["Goma", "ville lacustre et volcanique", "Rives d'un grand lac bleu, sol de roche volcanique noire, murs de blocs de lave sombre, rues poussiéreuses, collines vertes et cône volcanique au loin, camions humanitaires et motos très présentes."], ["Matadi", "port historique encaissé", "Ville accrochée à de raides collines rocailleuses au-dessus d'un fleuve rapide encaissé, maisons étagées aux toits de tôle, entrepôts du port, grand pont suspendu, grues et végétation sèche."], ["Lubumbashi", "deuxième ville minière du sud", "Avenues larges bordées d'arbres, villas coloniales basses entourées de jardins, collines artificielles sombres de déchets miniers, cheminées industrielles, sol de terre ocre et savane sèche aux environs."]], "kenya": [["Nairobi", "capitale", "Centre-ville de tours de verre et de béton gris-beige, avenues larges bordées de jacarandas, minibus colorés aux arrêts, trottoirs encombrés d'étals, quartiers résidentiels aux toits de tôle rouge, ciel souvent voilé et sol de terre rouge."], ["Kisumu", "ville lacustre", "Port sur grand lac peu profond aux rives plates bordées de papyrus et de jacinthes d'eau, pirogues et barques de pêche en bois, marché de poisson, bâtiments bas colorés, toits de tôle, rues poussiéreuses larges, chaleur humide."], ["Lamu (vieille ville)", "ville historique swahilie", "Ruelles étroites sans voitures entre hauts murs de pierre de corail blanchis, portes en bois sculpté massives, toits plats en terrasse, ânes, patios intérieurs, boutres à voile triangulaire au bord d'une eau calme, palmiers."], ["Mombasa", "deuxième ville, port côtier", "Immeubles clairs patinés par l'humidité et le sel, balcons et vérandas ombragés, palmiers à noix de coco, manguiers, tuk-tuks, ferry et port à conteneurs, sol de sable corallien, lumière vive et ciel bleu chaud."], ["Nyeri (hautes terres)", "zone rurale de montagne", "Pentes vertes ondulées couvertes de théiers et de caféiers en rangs, petites maisons de bois ou de pierre au toit de tôle ondulée, sol de terre rouge, bananiers, bétail en stabulation, chemins en terre, montagne bleutée au loin."]], "ethiopie": [["Addis-Abeba", "capitale", "Capitale en altitude étalée sur des collines, mélange de tours modernes et de grues de chantier, immeubles en béton peints, quartiers de maisons basses à toit de tôle, eucalyptus omniprésents, tramway léger, minibus bleu et blanc, air frais."], ["Gondar", "ville des hauts plateaux du nord", "Ville des hauts plateaux du nord, murs de pierre sombre et enceintes crénelées, maisons en pierre et torchis à toit de tôle, rues pentues, marchés animés, champs en terrasses de teff, collines sèches ocre."], ["Bahir Dar", "ville lacustre", "Ville au bord d'un vaste lac, larges avenues bordées de palmiers, bâtiments bas en béton colorés, bajaj bleus à trois roues, bateaux en papyrus, rives vertes, ciel clair, brume légère sur l'eau le matin."], ["Harar (Jugol)", "vieille ville fortifiée", "Vieille ville fortifiée aux ruelles étroites et tortueuses, maisons basses en pierre crépie peintes en couleurs vives (bleu, vert, rose, ocre), portes en bois, marché animé de paniers et d'épices, murs d'enceinte en pierre claire, toits plats."], ["Campagne de l'Amhara (région de Lalibela)", "zone rurale de montagne", "Hameaux de huttes rondes en pierre ou torchis au toit de chaume conique ou de tôle, enclos de pierre sèche, champs en terrasses de teff et d'orge, ânes chargés, eucalyptus, relief montagneux aride ocre et vert."]], "afsud": [["Johannesburg", "plus grande ville", "Tours de bureaux vitrées et immeubles art déco sur grille de rues, grillages et murs d'enceinte surmontés de fils barbelés, jacarandas, terrils miniers jaunes à l'horizon, sol sec de plateau d’altitude, taxis-minibus blancs."], ["Durban", "ville côtière subtropicale", "Front de mer en béton avec hôtels et tours des années soixante-dix, longue plage de sable doré, jetées, pousse-pousse décorés, palmiers, végétation subtropicale dense, collines vertes, climat humide, port industriel aux grues."], ["Bo-Kaap (Le Cap)", "quartier historique", "Rues pentues pavées aux maisons basses mitoyennes peintes en couleurs vives (rose, vert, bleu, jaune), toits plats ou à pignon, fenêtres à guillotine, minaret blanc au loin, façades étroites sans jardins."], ["Le Cap", "deuxième grande ville, port", "Ville entre mer et grande montagne à sommet plat, bâtiments victoriens et tours modernes, pins, quartiers de villas blanches à toit de tuiles, autoroutes sur viaducs, port avec grues, ciel bleu venteux."]]};
+const RUES={"togo": [["Rue du Caméléon", "un caméléon coloré peint sur un mur"], ["Ruelle du Héron", "un héron blanc perché au bord de l’eau ou sur un toit"], ["Avenue du Tisserin", "des nids de tisserins suspendus aux branches"], ["Allée du Pilon", "un grand pilon et un mortier posés devant une cour"], ["Impasse de la Calebasse", "des calebasses qui sèchent devant une maison"], ["Passage de l’Enclume", "une forge ouverte avec un forgeron, un marteau et une enclume"], ["Chemin des Manguiers", "de grands manguiers qui bordent la rue"], ["Boulevard des Flamboyants", "des flamboyants en fleurs rouges qui bordent la rue"], ["Passage de l’Étoile du Matin", "la lumière dorée du petit matin au bout de la rue"], ["Chemin du Vieux Gardien", "un très vieil arbre majestueux au bout de la rue"]], "benin": [["Rue de la Tortue", "une grande tortue qui traverse lentement la ruelle"], ["Ruelle du Calao", "un calao perché sur une branche au-dessus de la rue"], ["Avenue du Héron", "un héron blanc perché au bord de l’eau ou sur un toit"], ["Allée de la Pirogue", "une pirogue posée sur des supports au bord de la rue"], ["Impasse du Tisserand", "un tisserand devant un métier à tisser étroit aux fils colorés"], ["Passage du Tamis", "des tamis et des paniers tressés suspendus à un mur"], ["Chemin des Palmiers", "des palmiers qui bordent la rue"], ["Boulevard des Manguiers", "de grands manguiers qui bordent la rue"], ["Passage de l’Étoile du Matin", "la lumière dorée du petit matin au bout de la rue"], ["Chemin du Vieux Gardien", "un très vieil arbre majestueux au bout de la rue"]], "civ": [["Rue du Calao", "un calao perché sur une branche au-dessus de la rue"], ["Ruelle du Caméléon", "un caméléon coloré peint sur un mur"], ["Avenue du Héron", "un héron blanc perché au bord de l’eau ou sur un toit"], ["Allée de la Pirogue", "une pirogue posée sur des supports au bord de la rue"], ["Impasse du Pilon", "un grand pilon et un mortier posés devant une cour"], ["Passage de l’Enclume", "une forge ouverte avec un forgeron, un marteau et une enclume"], ["Chemin des Palmiers", "des palmiers qui bordent la rue"], ["Boulevard des Bananiers", "des bananiers dans les cours voisines"], ["Passage de l’Étoile du Matin", "la lumière dorée du petit matin au bout de la rue"], ["Chemin du Vieux Gardien", "un très vieil arbre majestueux au bout de la rue"]], "senegal": [["Rue du Pélican", "un pélican posé sur une barque ou un toit"], ["Ruelle du Faucon", "un faucon perché sur un toit ou un poteau"], ["Avenue de la Tortue", "une grande tortue qui traverse lentement la ruelle"], ["Allée de la Pirogue", "une pirogue posée sur des supports au bord de la rue"], ["Impasse du Tamis", "des tamis et des paniers tressés suspendus à un mur"], ["Passage de l’Aiguille", "un tailleur à sa machine à coudre devant sa boutique"], ["Chemin du Baobab", "un énorme baobab au carrefour"], ["Boulevard des Cocotiers", "des cocotiers penchés au-dessus des murs"], ["Passage de l’Étoile du Matin", "la lumière dorée du petit matin au bout de la rue"], ["Chemin du Vieux Gardien", "un très vieil arbre majestueux au bout de la rue"]], "mali": [["Rue du Faucon", "un faucon perché sur un toit ou un poteau"], ["Ruelle du Varan", "un grand varan qui se chauffe sur un mur de pierre"], ["Avenue de l’Ibis", "un ibis au long bec marchant au bord de la rue"], ["Allée du Tisserand", "un tisserand devant un métier à tisser étroit aux fils colorés"], ["Impasse de l’Enclume", "une forge ouverte avec un forgeron, un marteau et une enclume"], ["Passage de la Calebasse", "des calebasses qui sèchent devant une maison"], ["Chemin des Karités", "de grands karités qui donnent de l’ombre"], ["Boulevard des Acacias", "des acacias à la cime plate le long de la rue"], ["Passage de l’Étoile du Matin", "la lumière dorée du petit matin au bout de la rue"], ["Chemin du Vieux Gardien", "un très vieil arbre majestueux au bout de la rue"]], "burkina": [["Rue du Calao", "un calao perché sur une branche au-dessus de la rue"], ["Ruelle du Varan", "un grand varan qui se chauffe sur un mur de pierre"], ["Avenue du Faucon", "un faucon perché sur un toit ou un poteau"], ["Allée de la Calebasse", "des calebasses qui sèchent devant une maison"], ["Impasse du Tisserand", "un tisserand devant un métier à tisser étroit aux fils colorés"], ["Passage du Pilon", "un grand pilon et un mortier posés devant une cour"], ["Chemin des Karités", "de grands karités qui donnent de l’ombre"], ["Boulevard des Neems", "de grands neems qui ombragent les cours"], ["Passage de l’Étoile du Matin", "la lumière dorée du petit matin au bout de la rue"], ["Chemin du Vieux Gardien", "un très vieil arbre majestueux au bout de la rue"]], "cameroun": [["Rue du Caméléon", "un caméléon coloré peint sur un mur"], ["Ruelle du Calao", "un calao perché sur une branche au-dessus de la rue"], ["Avenue du Tisserin", "des nids de tisserins suspendus aux branches"], ["Allée de l’Enclume", "une forge ouverte avec un forgeron, un marteau et une enclume"], ["Impasse de la Pirogue", "une pirogue posée sur des supports au bord de la rue"], ["Passage du Tamis", "des tamis et des paniers tressés suspendus à un mur"], ["Chemin des Bananiers", "des bananiers dans les cours voisines"], ["Boulevard des Manguiers", "de grands manguiers qui bordent la rue"], ["Passage de l’Étoile du Matin", "la lumière dorée du petit matin au bout de la rue"], ["Chemin du Vieux Gardien", "un très vieil arbre majestueux au bout de la rue"]], "rdc": [["Rue du Héron", "un héron blanc perché au bord de l’eau ou sur un toit"], ["Ruelle du Martin-Pêcheur", "un martin-pêcheur bleu sur une branche près de l’eau"], ["Avenue du Calao", "un calao perché sur une branche au-dessus de la rue"], ["Allée de la Pirogue", "une pirogue posée sur des supports au bord de la rue"], ["Impasse de l’Enclume", "une forge ouverte avec un forgeron, un marteau et une enclume"], ["Passage de l’Aiguille", "un tailleur à sa machine à coudre devant sa boutique"], ["Chemin des Palmiers", "des palmiers qui bordent la rue"], ["Boulevard des Bananiers", "des bananiers dans les cours voisines"], ["Passage de l’Étoile du Matin", "la lumière dorée du petit matin au bout de la rue"], ["Chemin du Vieux Gardien", "un très vieil arbre majestueux au bout de la rue"]], "afrique": [["Rue du Faucon", "un faucon perché sur un toit ou un poteau"], ["Ruelle du Caméléon", "un caméléon coloré peint sur un mur"], ["Avenue du Héron", "un héron blanc perché au bord de l’eau ou sur un toit"], ["Allée du Pilon", "un grand pilon et un mortier posés devant une cour"], ["Impasse de l’Enclume", "une forge ouverte avec un forgeron, un marteau et une enclume"], ["Passage de la Calebasse", "des calebasses qui sèchent devant une maison"], ["Chemin du Baobab", "un énorme baobab au carrefour"], ["Boulevard des Manguiers", "de grands manguiers qui bordent la rue"], ["Passage de l’Étoile du Matin", "la lumière dorée du petit matin au bout de la rue"], ["Chemin du Vieux Gardien", "un très vieil arbre majestueux au bout de la rue"]], "ghana": [["Hornbill Street", "un calao perché sur une branche au-dessus de la rue"], ["Heron Lane", "un héron blanc perché au bord de l’eau ou sur un toit"], ["Weaverbird Avenue", "des nids de tisserins suspendus aux branches"], ["Weaver’s Road", "un tisserand devant un métier à tisser étroit aux fils colorés"], ["Canoe Alley", "une pirogue posée sur des supports au bord de la rue"], ["Anvil Passage", "une forge ouverte avec un forgeron, un marteau et une enclume"], ["Palm Path", "des palmiers qui bordent la rue"], ["Mango Boulevard", "de grands manguiers qui bordent la rue"], ["Morning Star Passage", "la lumière dorée du petit matin au bout de la rue"], ["Old Guardian Path", "un très vieil arbre majestueux au bout de la rue"]], "nigeria": [["Falcon Street", "un faucon perché sur un toit ou un poteau"], ["Hornbill Lane", "un calao perché sur une branche au-dessus de la rue"], ["Chameleon Avenue", "un caméléon coloré peint sur un mur"], ["Weaver’s Road", "un tisserand devant un métier à tisser étroit aux fils colorés"], ["Pestle Alley", "un grand pilon et un mortier posés devant une cour"], ["Calabash Passage", "des calebasses qui sèchent devant une maison"], ["Palm Path", "des palmiers qui bordent la rue"], ["Mango Boulevard", "de grands manguiers qui bordent la rue"], ["Morning Star Passage", "la lumière dorée du petit matin au bout de la rue"], ["Old Guardian Path", "un très vieil arbre majestueux au bout de la rue"]], "kenya": [["Flamingo Street", "des flamants roses en bordure d’un point d’eau au loin"], ["Antelope Lane", "une fresque murale d’une antilope bondissante"], ["Falcon Avenue", "un faucon perché sur un toit ou un poteau"], ["Sieve Road", "des tamis et des paniers tressés suspendus à un mur"], ["Calabash Alley", "des calebasses qui sèchent devant une maison"], ["Needle Passage", "un tailleur à sa machine à coudre devant sa boutique"], ["Acacia Path", "des acacias à la cime plate le long de la rue"], ["Jacaranda Boulevard", "des jacarandas aux fleurs violettes"], ["Morning Star Passage", "la lumière dorée du petit matin au bout de la rue"], ["Old Guardian Path", "un très vieil arbre majestueux au bout de la rue"]], "ethiopie": [["Ibis Street", "un ibis au long bec marchant au bord de la rue"], ["Falcon Lane", "un faucon perché sur un toit ou un poteau"], ["Antelope Avenue", "une fresque murale d’une antilope bondissante"], ["Weaver’s Road", "un tisserand devant un métier à tisser étroit aux fils colorés"], ["Sieve Alley", "des tamis et des paniers tressés suspendus à un mur"], ["Calabash Passage", "des calebasses qui sèchent devant une maison"], ["Eucalyptus Path", "de hauts eucalyptus le long de la rue"], ["Acacia Boulevard", "des acacias à la cime plate le long de la rue"], ["Morning Star Passage", "la lumière dorée du petit matin au bout de la rue"], ["Old Guardian Path", "un très vieil arbre majestueux au bout de la rue"]], "afsud": [["Falcon Street", "un faucon perché sur un toit ou un poteau"], ["Antelope Lane", "une fresque murale d’une antilope bondissante"], ["Flamingo Avenue", "des flamants roses en bordure d’un point d’eau au loin"], ["Anvil Road", "une forge ouverte avec un forgeron, un marteau et une enclume"], ["Needle Alley", "un tailleur à sa machine à coudre devant sa boutique"], ["Sieve Passage", "des tamis et des paniers tressés suspendus à un mur"], ["Aloe Path", "des aloès rouges et verts au bord du chemin"], ["Acacia Boulevard", "des acacias à la cime plate le long de la rue"], ["Morning Star Passage", "la lumière dorée du petit matin au bout de la rue"], ["Old Guardian Path", "un très vieil arbre majestueux au bout de la rue"]]};
+function fillRues(){
+ const k=countryKey(),l=RUES[k]||RUES.afrique,items=[{value:'',text:'— Aucune —'}];
+ l.forEach((x,i)=>items.push({value:'r:'+i,text:x[0]}));
+ items.push({value:'libre',text:'✍️ Autre rue (j’écris le nom)'});
+ setOptions($('rue'),[{items}]);syncRue();
+}
+function syncRue(){$('rueLibreBox').hidden=$('rue').value!=='libre'}
+function rueHintText(){
+ const v=$('rue').value;if(!$('rueHint').checked||!v.startsWith('r:'))return '';
+ const x=(RUES[countryKey()]||RUES.afrique)[+v.slice(2)];return x?x[1]:'';
+}
+function rueName(){const v=$('rue').value;if(v==='libre')return $('rueLibre').value.trim();if(v.startsWith('r:')){const x=(RUES[countryKey()]||RUES.afrique)[+v.slice(2)];return x?x[0]:''}return ''}
+function fillLieux(){
+ const k=countryKey(),l=LIEUX[k]||[],items=[{value:'',text:'— Aucun : cadre général du pays —'}];
+ l.forEach((x,i)=>items.push({value:'l:'+i,text:x[0]+' — '+x[1]}));
+ items.push({value:'libre',text:'✍️ Autre lieu (je le décris)'});
+ setOptions($('lieu'),[{items}]);syncLieu();fillRues();
+}
+function syncLieu(){$('lieuLibreBox').hidden=$('lieu').value!=='libre'}
+function lieuText(){
+ const v=$('lieu').value;
+ if(v==='libre')return $('lieuLibre').value.trim().replace(/[.\s]+$/,'');
+ if(v.startsWith('l:')){const x=(LIEUX[countryKey()]||[])[+v.slice(2)];return x?x[2].replace(/[.\s]+$/,''):''}
+ return '';
+}
+function lieuName(){const o=$('lieu').options[$('lieu').selectedIndex];return o&&$('lieu').value.startsWith('l:')?o.textContent.split(' — ')[0]:($('lieu').value==='libre'?'lieu libre':'')}
 function fillDecors(){
  const c=curCountry(),k=countryKey(),groups=[];
  if(c.decors.length)groups.push({label:'Décors typiques — '+c.nom,items:c.decors.map(d=>({value:d,text:d}))});
+ groups.push({label:'🎲 Cadres variés — '+c.nom,items:[{value:'auto',text:'🎲 Cadre varié automatique (différent à chaque scène)'}].concat(cadresFor(k))});
  const f=k==='autre'?{r:'ruines inspirées de l’histoire et de l’architecture de '+c.nom,f:'forêt sacrée inspirée des paysages et des traditions de '+c.nom,a:'arène de pierre en lévitation au-dessus d’un paysage emblématique de '+c.nom}:(FDEC[k]||FDEC.afrique);
  groups.push({label:'✨ Décors fantastiques — '+c.nom,items:[
   {value:'Ruines anciennes : '+f.r+'. Ambiance fantastique et mystérieuse.',text:'🏛️ Ruines anciennes — '+shortTxt(f.r)},
@@ -618,6 +765,7 @@ function fillDecors(){
  groups.push({label:'Décors courants',items:DECORS_COMMUNS.map(d=>({value:d,text:d}))});
  groups.push({items:[{value:'libre',text:'✍️ Décor culturel libre (je le décris)'}]});
  setOptions($('setting'),groups);
+ fillLieux();
  syncDecor();
 }
 function fillCombat(){
@@ -626,7 +774,49 @@ function fillCombat(){
  [['Lutte à mains nues, prises et projections','Lutte'],['Boxe','Boxe'],['Arts martiaux, coups de poing et de pied','Arts martiaux'],['Combat au bâton, sport traditionnel sans arme tranchante','Combat au bâton'],['Bagarre de rue entre jeunes, sans gravité (style BD)','Bagarre de rue'],['Duel de super-héros africains aux pouvoirs inspirés des légendes (fantastique)','Super-héros africains'],['Poursuite puis affrontement dans le quartier','Poursuite et affrontement'],['Duel de guerriers inspiré de l’histoire africaine (stylisé, sans gore)','Guerriers historiques']].forEach(x=>items.push({value:x[0],text:x[1]}));
  setOptions($('combatType'),[{items}]);
 }
+
+const FICHE={
+ face:['visage ovale','visage rond et plein','visage carré à la mâchoire marquée','visage allongé','visage en cœur, menton fin'],
+ eyes:['grands yeux en amande','yeux ronds et vifs','yeux fins et étirés','petits yeux malicieux','yeux tombants et doux'],
+ nose:['nez large et arrondi','nez droit et fin','petit nez retroussé','nez fort à l’arête marquée'],
+ lips:['lèvres pleines','lèvres fines','lèvres moyennes bien dessinées','lèvre inférieure ourlée'],
+ build:['corpulence mince','corpulence athlétique','corpulence robuste et large d’épaules','corpulence ronde','corpulence frêle'],
+ height:['taille moyenne','petite taille','grande taille'],
+ marks:['cicatrice à la joue','cicatrice au sourcil','scarifications traditionnelles sur les joues','motifs tatoués sur le bras','lunettes rondes','mèche colorée dans les cheveux','perles dans les cheveux','grand anneau doré à l’oreille','foulard noué au cou','bandeau sur le front','amulette en cuir autour du cou','grain de beauté sous l’œil','léger espace entre les dents de devant','bracelet de cauris au poignet'],
+ hat:['aucun couvre-chef','bonnet traditionnel','chapeau de paille','casquette','foulard sur la tête','turban noué','calot brodé'],
+ shoes:['sandales','pieds nus','baskets','chaussures en cuir','bottes'],
+ prop:['aucun objet','sac en bandoulière','bâton de marche','instrument de musique (petit tambour)','cahier et stylo','panier','calebasse'],
+ pattern:['tissu uni','tissu wax à motifs colorés','tissu à rayures tissées','tissu à motifs géométriques','tissu teint à la main (indigo)'],
+ colors:['noir','blanc','rouge vif','orange','jaune doré','vert','bleu roi','violet','rose','marron','indigo','gris']
+};
+function fillFiche(){
+ const m={cFace:'face',cEyes:'eyes',cNose:'nose',cLips:'lips',cBuild:'build',cHeight:'height',cHat:'hat',cShoes:'shoes',cProp:'prop',cPattern:'pattern',cCol1:'colors',cCol2:'colors'};
+ for(const id in m){const el=$(id);if(el.options.length)continue;setOptions(el,[{items:FICHE[m[id]].map(x=>({value:x,text:x}))}])}
+ if(!$('cCol2').dataset.init){$('cCol2').selectedIndex=3;$('cCol2').dataset.init='1'}
+ const box=$('cMarks');if(box.children.length)return;
+ FICHE.marks.forEach(t=>{
+  const l=document.createElement('label'),i=document.createElement('input');i.type='checkbox';i.value=t;
+  i.onchange=()=>{const n=box.querySelectorAll('input:checked').length;if(n>3){i.checked=false;alert('3 signes distinctifs au maximum : choisis les plus visibles.');return}l.classList.toggle('on',i.checked)};
+  l.append(i,document.createTextNode(t));box.appendChild(l);
+ });
+}
+function ficheValues(){
+ return {
+  traits:[$('cFace').value,$('cEyes').value,$('cNose').value,$('cLips').value,$('cBuild').value,$('cHeight').value],
+  marks:[...$('cMarks').querySelectorAll('input:checked')].map(i=>i.value),
+  costume:{hat:$('cHat').value,shoes:$('cShoes').value,prop:$('cProp').value,pattern:$('cPattern').value,c1:$('cCol1').value,c2:$('cCol2').value}
+ };
+}
+function ficheText(f){
+ const c=f.costume,pc=[];
+ if(!/^aucun/.test(c.hat))pc.push(c.hat);
+ pc.push(c.shoes);
+ if(!/^aucun/.test(c.prop))pc.push(c.prop);
+ const cos=c.pattern+', couleurs dominantes '+c.c1+' et '+c.c2+(pc.length?', '+pc.join(', '):'');
+ return {traits:f.traits.join(', '),marks:f.marks.length?f.marks.join(', '):'',costume:cos};
+}
 function fillCreator(){
+ fillFiche();
  const c=curCountry();
  setOptions($('cSkin'),[{items:TEINTS.map(t=>({value:t[0],text:t[1]}))}]);
  if(!$('cSkin').dataset.init){$('cSkin').value='peau très foncée';$('cSkin').dataset.init='1'}
@@ -688,20 +878,85 @@ function renderMyChars(){
   const s=document.createElement('span');s.textContent=u.label;
   const b=document.createElement('button');b.className='danger';b.textContent='Supprimer';
   b.onclick=()=>{if(confirm('Supprimer ce personnage ?')){userChars=userChars.filter(x=>x.id!==u.id);saveUserChars();renderMyChars();fillChars()}};
-  d.append(s,b);box.appendChild(d);
+  d.append(s);
+  if(u.fiche){const o=document.createElement('button');o.textContent='Autre tenue';o.onclick=()=>enterCostumeMode(u);d.append(o)}
+  d.append(b);box.appendChild(d);
  });
 }
+let costumeBase=null;
+const LOCKED=['cAge','cSex','cSkin','cHair','cFace','cEyes','cNose','cLips','cBuild','cHeight'];
+function setSel(id,v){const el=$(id);if([...el.options].some(o=>o.value===v))el.value=v}
+function enterCostumeMode(u){
+ const f=u.fiche;costumeBase=u;$('creator').open=true;$('costBanner').hidden=false;
+ $('cName').value=f.nom+' (autre tenue)';$('cAge').value=f.age;setSel('cSex',f.sexe);setSel('cSkin',f.peau);setSel('cHair',f.coiffure);
+ ['cFace','cEyes','cNose','cLips','cBuild','cHeight'].forEach((id,i)=>setSel(id,f.traits[i]));
+ $('cMarks').querySelectorAll('input').forEach(i=>{i.checked=f.marks.includes(i.value);i.parentNode.classList.toggle('on',i.checked)});
+ setSel('cOutfit',f.tenue);
+ LOCKED.forEach(id=>$(id).disabled=true);$('cMarks').querySelectorAll('input').forEach(i=>i.disabled=true);
+ $('creator').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function exitCostumeMode(){
+ costumeBase=null;$('costBanner').hidden=true;
+ LOCKED.forEach(id=>$(id).disabled=false);$('cMarks').querySelectorAll('input').forEach(i=>{i.disabled=false;i.checked=false;i.parentNode.classList.remove('on')});
+ $('cName').value='';
+}
+$('costCancel').onclick=exitCostumeMode;
 $('cSave').onclick=()=>{
- const name=$('cName').value.trim()||'Sans nom',age=Math.max(1,Math.min(110,parseInt($('cAge').value,10)||20)),s=$('cSex').value;
+ const B=costumeBase?costumeBase.fiche:null;
+ const name=$('cName').value.trim()||'Sans nom',age=B?B.age:Math.max(1,Math.min(110,parseInt($('cAge').value,10)||20)),s=B?B.sexe:$('cSex').value,skin=B?B.peau:$('cSkin').value,hair=B?B.coiffure:$('cHair').value;
  const acc=$('cAcc').value.trim(),trait=$('cTrait').value.trim(),c=curCountry();
- const desc=name+', '+sexNoun(s,age)+' de '+age+' ans ('+c.nom+'), '+$('cSkin').value+', '+$('cHair').value+', tenue : '+$('cOutfit').value+(acc?', accessoires : '+acc:'')+(trait?', '+trait:'');
- const u={id:Date.now(),label:name+' — '+sexNoun(s,age)+' ('+age+' ans)',desc};
+ const fv=ficheValues();if(B){fv.traits=B.traits.slice();fv.marks=B.marks.slice()}
+ const ft=ficheText(fv);
+ const desc=name+', '+sexNoun(s,age)+' de '+age+' ans ('+c.nom+'), '+skin+', '+ft.traits+', coiffure : '+hair+(ft.marks?', SIGNES DISTINCTIFS TOUJOURS VISIBLES : '+ft.marks:'')+', tenue : '+$('cOutfit').value+', '+ft.costume+(acc?', accessoires : '+acc:'')+(trait?', '+trait:'');
+ const u={id:Date.now(),label:name+' — '+sexNoun(s,age)+' ('+age+' ans)',desc,fiche:{nom:name,age,sexe:s,peau:skin,coiffure:hair,tenue:$('cOutfit').value,traits:fv.traits,marks:fv.marks,costume:fv.costume}};
  userChars.push(u);saveUserChars();renderMyChars();fillChars();$('char1').value='u:'+u.id;syncFree();
- ['cName','cAcc','cTrait'].forEach(id=>$(id).value='');
+ if(costumeBase)exitCostumeMode();
+ ['cName','cAcc','cTrait'].forEach(id=>$(id).value='');$('cMarks').querySelectorAll('input').forEach(i=>{i.checked=false;i.parentNode.classList.remove('on')});
  alert('Personnage enregistré et choisi comme Personnage 1.');
 };
 
 /* ---------- Prompt ---------- */
+
+const VIS={
+ togo:'côte du golfe de Guinée : sable clair et cocotiers, lagune, maisons basses en béton peint aux tons ocre et pastel, toits de tôle ondulée, terre rouge latéritique, motos-taxis, marchés de pagnes colorés ; dans le nord, maisons de terre à toit de chaume',
+ benin:'terre rouge, maisons basses en béton et tôle, motos-taxis aux chemises jaunes, palmiers à huile, villages lacustres sur pilotis, marchés très colorés',
+ ghana:'terre rouge, minibus colorés et peints, petits étals de bois peints, tissus kenté tissés, béton peint, côte atlantique et palmiers',
+ nigeria:'grande métropole animée : bus jaunes, marchés denses, mélange d’immeubles modernes et de toits de tôle, tissus aso-oke et ankara ; dans le nord, architecture en terre aux motifs géométriques',
+ senegal:'côte sablonneuse, baobabs, pirogues de pêche peintes de couleurs vives, murs ocre et bleus, boubous, minibus décorés très colorés',
+ mali:'architecture en terre crue (banco) aux poutres de bois saillantes, tons ocre, savane sahélienne, tissus bogolan',
+ civ:'lagune bordée de palmiers, skyline moderne, maisons colorées, marchés animés, plantations de cacao et de palmiers, tissus wax',
+ burkina:'terre rouge, cases rondes aux murs peints de motifs géométriques noir, blanc et ocre, savane sèche, vélos et mobylettes, arbres à karité',
+ cameroun:'relief varié : forêt tropicale au sud, montagnes et volcan, maisons en béton et tôle, marchés animés, plantations de bananiers',
+ rdc:'fleuve très large, forêt dense, ville dense aux couleurs vives, pirogues, tissus pagnes éclatants, élégance vestimentaire soignée',
+ kenya:'savane aux acacias, terre rouge, minibus peints très colorés, couvertures rouges à carreaux, hauts plateaux verts, côte aux maisons en pierre de corail',
+ ethiopie:'hauts plateaux, églises de pierre taillées dans le roc, maisons rondes, tissus blancs aux bordures colorées, cérémonie du café',
+ afsud:'villes modernes, quartiers colorés aux maisons basses, côte rocheuse, vignobles, montagne à sommet plat',
+ afrique:'paysage africain contemporain varié et précis, sans savane générique'
+};
+function visFor(){const k=countryKey();if(k==='autre')return $('otherCulture').value.trim()||'décor africain contemporain précis, sans cliché';return VIS[k]||VIS.afrique}
+function sanitizeNames(t){
+ const k=countryKey(),c=curCountry(),names=[];
+ if(k!=='afrique'&&k!=='autre')names.push({n:c.nom,t:'p'},{n:c.ville,t:'v'});
+ if(k==='autre'){const o=$('otherCountry').value.trim();if(o)names.push({n:o,t:'p'})}
+ const L='(?![\\p{L}])',B='(?<![\\p{L}])';
+ names.forEach(({n,t:ty})=>{
+  if(!n)return;const e=n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  t=t.replace(new RegExp('\\s*\\(\\s*'+e+'\\s*\\)','giu'),'');
+  t=t.replace(new RegExp(',\\s*'+e+L,'giu'),'');
+  if(ty==='p'){
+   t=t.replace(new RegExp(B+"(?:du|de|d[’'])\\s*"+e+L,'giu'),'du pays');
+   t=t.replace(new RegExp(B+'(?:au|en)\\s+'+e+L,'giu'),'dans le pays');
+   t=t.replace(new RegExp(B+e+L,'giu'),'ce pays');
+  }else{
+   t=t.replace(new RegExp(B+'(?:à|dans)\\s+'+e+L,'giu'),'dans la ville');
+   t=t.replace(new RegExp(B+'près (?:de|du)\\s+'+e+L,'giu'),'près de la ville');
+   t=t.replace(new RegExp(B+'(?:de|du)\\s+'+e+L,'giu'),'de la ville');
+   t=t.replace(new RegExp(B+e+L,'giu'),'la ville');
+  }
+ });
+ if(k==='rdc')t=t.replace(/fleuve Congo/gi,'grand fleuve').replace(/(?<![\p{L}])(?:du|de)\s+Congo(?![\p{L}])/giu,'du pays').replace(/Congo/gi,'ce pays');
+ return t;
+}
 function makePrompt(){
  const c=curCountry(),st=$('sceneType').value,combat=st==='combat',fant=st==='fantasy',fight=combat||fant;
  const a=charInfo('char1','free1'),b=charInfo('char2','free2');
@@ -709,11 +964,12 @@ function makePrompt(){
  const dialogue=$('dialogue').value.trim(),notes=$('notes').value.trim();
  const extra=countryKey()==='autre'?$('otherCulture').value.trim():'';
  let t='Créer UNE illustration de bande dessinée originale'+(combat?' : SCÈNE DE COMBAT.':fant?' : COMBAT FANTASTIQUE ET HÉROÏQUE.':'.')+'\n\n';
- t+='CULTURE ET PAYS : '+c.nom+(countryKey()==='autre'||countryKey()==='afrique'?'':' ('+c.ville+')')+(extra?' — '+extra:'')+'.\n';
+ t+='CONTEXTE CULTUREL VISUEL (ne jamais écrire de nom de pays ni de ville dans l’image) : '+(lieuText()?lieuText():visFor())+(extra&&countryKey()!=='autre'?' — '+extra:'')+'.\n';
  t+='PERSONNAGE 1 : '+(a.desc||'[décrire le personnage principal]')+'.\n';
  if(b.desc)t+='PERSONNAGE 2 : '+b.desc+'.\n';
  else if(fight)t+='PERSONNAGE 2 (adversaire) : à décrire dans l’action.\n';
- t+='DÉCOR : '+decorText()+'.\nACTION : '+action+'.\n';
+ if(a.desc||b.desc)t+='IDENTITÉ VERROUILLÉE (identique dans toutes les images) : chaque personnage garde exactement le visage, la coiffure, la carnation, la corpulence, la taille, les signes distinctifs et la tenue décrits ci-dessus. Ne rien modifier, retirer, ajouter ni réinterpréter. Les signes distinctifs restent visibles quel que soit le plan.\n';
+ t+='DÉCOR : '+decorText()+(rueHintText()?' ; '+rueHintText():'')+'.\nACTION : '+action+'.\n';
  if(fant)t+=fantText();
  if(fight){
   t+='COMBAT : '+(fant?'combat fantastique et héroïque':$('combatType').value)+'. Intensité : '+$('combatLevel').value+'. Moment : '+$('combatMoment').value+'.\n';
@@ -721,12 +977,17 @@ function makePrompt(){
   if($('noGore').checked)t+='LIMITES : aucun sang, aucune blessure grave, aucune cruauté ; combat adapté à un public jeune.\n';
  }
  t+='CADRAGE ET POSE : '+$('pose').value+'.\nSTYLE : '+$('style').value+'.\n';
- t+=dialogue?'DIALOGUE À INTÉGRER SI LE MODÈLE REND BIEN LE TEXTE :\n'+dialogue+'\n':'DIALOGUE : ne pas ajouter de texte ni de bulles non demandés.\n';
+ const nRep=dialogue?dialogue.split('\n').filter(x=>x.trim()).length:0,sgn=$('signText').value.trim();
+ if(!dialogue)t+='TEXTE DANS L’IMAGE : aucun texte, aucune lettre, aucune bulle.\n';
+ else if($('dlgMode').value==='image')t+='TEXTE DANS L’IMAGE : écrire UNIQUEMENT les répliques suivantes, exactement, mot pour mot, une par bulle, sans rien modifier, ajouter ni omettre ; aucun autre texte. Si les lettres ne sont pas nettes, laisser les bulles vides.\nRÉPLIQUES :\n§§DLG§§\n';
+ else t+='TEXTE DANS L’IMAGE : dessiner '+nRep+' bulle'+(nRep>1?'s':'')+' de dialogue VIDE'+(nRep>1?'S':'')+', sans aucune lettre, dans l’ordre de lecture ; les répliques seront ajoutées plus tard.\n';
+ t+='DÉCOR SANS TEXTE : aucun drapeau, aucun nom de pays ou de ville, aucune lettre, aucun mot ni inscription sur les murs, panneaux, affiches, enseignes, vêtements ou véhicules'+(sgn?' (seule exception : une enseigne portant exactement « '+sgn+' »)':'')+'.\n';
  if(notes)t+='DÉTAILS À RESPECTER : '+notes+'\n';
- t+='\nRESPECT CULTUREL : représenter '+c.nom+' de façon authentique, moderne et digne ; tenues, architecture, objets et décors réalistes et propres à ce pays ; éviter les clichés (pas de savane générique, pas de caricature, pas d’exotisme). Les personnages ont la carnation décrite, rendue avec des nuances de lumière naturelles et flatteuses.\n';
+ t+='\nRESPECT CULTUREL : représenter cette culture de façon authentique, moderne et digne ; tenues, architecture, objets et décors réalistes et propres à ce pays ; éviter les clichés (pas de savane générique, pas de caricature, pas d’exotisme). Les personnages ont la carnation décrite, rendue avec des nuances de lumière naturelles et flatteuses.\n';
  if(fant)t+='ORIGINALITÉ : pouvoirs, techniques, tenues et symboles entièrement originaux, inspirés du genre fantasy et shonen mais sans reprendre aucun personnage, costume, emblème ni technique d’une œuvre existante. Les motifs culturels sont purement décoratifs et représentés avec respect, sans caricature ni détournement d’objets sacrés.\n';
- t+='COHÉRENCE VISUELLE : respecter la même apparence, la même carnation, la coiffure, les vêtements et les accessoires des personnages décrits. Anatomie naturelle, mains lisibles, expressions crédibles, composition claire, éclairage cohérent, contours nets, couleurs maîtrisées. Une seule scène, sans collage de plusieurs cases, sans logo, sans signature ni texte parasite.';
- return t;
+ t+='COHÉRENCE VISUELLE : respecter la même apparence, la même carnation, la coiffure, les vêtements et les accessoires des personnages décrits. Anatomie naturelle, mains lisibles, expressions crédibles, composition claire, éclairage cohérent, contours nets, couleurs maîtrisées. Une seule scène, sans collage de plusieurs cases, sans logo.';
+t=sanitizeNames(t);
+ return t.replace('§§DLG§§',dialogue);
 }
 
 /* ---------- Carnet ---------- */
@@ -737,7 +998,7 @@ function currentScene(){
  return {id:Date.now(),created:new Date().toISOString(),country:countryKey(),otherCountry:$('otherCountry').value,otherCulture:$('otherCulture').value,
   char1:$('char1').value,char2:$('char2').value,free1:$('free1').value,free2:$('free2').value,char1Label:a.label,char2Label:b.label,
   sceneType:$('sceneType').value,fVoie:$('fVoie').value,fElem:$('fElem').value,fArme:$('fArme').value,fCercle:$('fCercle').value,fMotif:$('fMotif').value,fCoul:$('fCoul').value,fPuis:$('fPuis').value,combatType:$('combatType').value,combatLevel:$('combatLevel').value,combatMoment:$('combatMoment').value,fx:$('fx').checked,noGore:$('noGore').checked,
-  setting:$('setting').value,decorLibre:$('decorLibre').value,pose:$('pose').value,style:$('style').value,action:$('action').value,dialogue:$('dialogue').value,notes:$('notes').value,prompt:$('prompt').value};
+  rue:$('rue').value,rueLibre:$('rueLibre').value,rueLabel:rueName(),lieu:$('lieu').value,lieuLibre:$('lieuLibre').value,lieuLabel:lieuName(),setting:$('setting').value,decorLibre:$('decorLibre').value,pose:$('pose').value,style:$('style').value,action:$('action').value,dialogue:$('dialogue').value,notes:$('notes').value,prompt:$('prompt').value};
 }
 function renderScenes(){
  const box=$('scenes'),items=readScenes();
@@ -746,7 +1007,7 @@ function renderScenes(){
  items.slice().reverse().forEach(item=>{
   const div=document.createElement('div');div.className='scene';
   const h=document.createElement('h3');
-  h.textContent=(item.sceneType==='combat'?'⚔️ ':item.sceneType==='fantasy'?'✨ ':'')+(item.char1Label||item.characterLabel||'Scène')+(item.char2Label?' & '+item.char2Label:'')+' — '+(item.setting||'');
+  h.textContent=(item.sceneType==='combat'?'⚔️ ':item.sceneType==='fantasy'?'✨ ':'')+(item.char1Label||item.characterLabel||'Scène')+(item.char2Label?' & '+item.char2Label:'')+(item.lieuLabel?' · 📍 '+item.lieuLabel:'')+(item.rueLabel?' · 🛣️ '+item.rueLabel:'')+' — '+(item.setting||'');
   div.appendChild(h);
   const p=document.createElement('p');p.textContent=item.action||'(Action non renseignée)';div.appendChild(p);
   const b=document.createElement('div');b.className='buttons';
@@ -768,7 +1029,7 @@ function loadScene(id){
  setIf('sceneType',s.sceneType||'normal');['fVoie','fElem','fArme','fCercle','fMotif','fCoul','fPuis'].forEach(k=>setIf(k,s[k]));syncScene();syncSugg();
  setIf('combatType',s.combatType);setIf('combatLevel',s.combatLevel);setIf('combatMoment',s.combatMoment);
  if(s.fx!==undefined)$('fx').checked=s.fx;if(s.noGore!==undefined)$('noGore').checked=s.noGore;
- setIf('setting',s.setting);setIf('decorLibre',s.decorLibre);syncDecor();setIf('pose',s.pose);setIf('style',s.style);
+ setIf('rue',s.rue);setIf('rueLibre',s.rueLibre);syncRue();setIf('lieu',s.lieu);setIf('lieuLibre',s.lieuLibre);syncLieu();setIf('setting',s.setting);setIf('decorLibre',s.decorLibre);syncDecor();setIf('pose',s.pose);setIf('style',s.style);
  $('action').value=s.action||'';$('dialogue').value=s.dialogue||'';$('notes').value=s.notes||'';$('prompt').value=s.prompt||'';
  window.scrollTo({top:0,behavior:'smooth'});
 }

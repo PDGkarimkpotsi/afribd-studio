@@ -197,9 +197,11 @@ input[type=text],select,textarea{width:100%;font:inherit;border:2px solid #cfe0d
     <textarea id="txt" style="min-height:70px" placeholder="Écris le texte ou le dialogue ici…">Texte</textarea>
     <div class="row3">
       <label>Police<select id="txtFont"><option value="sans">Standard</option><option value="bd">Bande dessinée</option><option value="titre">Titre gras</option><option value="serif">Écriture</option></select></label>
-      <label>Bulle<select id="txtBubble"><option value="none">Aucune</option><option value="oval" selected>Ovale (parole)</option><option value="round">Rectangle arrondi</option><option value="square">Narration</option><option value="thought">Pensée</option><option value="shout">Cri</option></select></label>
+      <label>Bulle<select id="txtBubble"><option value="none">Aucune</option><option value="oval" selected>Ovale (parole)</option><option value="round">Rectangle arrondi</option><option value="square">Narration</option><option value="thought">Pensée</option><option value="shout">Cri</option><option value="legend">Légende (case de narration jaune)</option></select></label>
       <label>Pointe<select id="txtTail"><option value="bl">Bas gauche</option><option value="br">Bas droite</option><option value="tl">Haut gauche</option><option value="tr">Haut droite</option><option value="none">Aucune</option></select></label>
     </div>
+    <div class="brow"><button id="txtLegend" type="button">📍 Modèle « légende de lieu »</button><button id="txtLastPlace" type="button">Lieu de ma dernière scène</button><button id="txtLastAddr" type="button">Adresse de ma dernière scène</button></div>
+    <label class="chk"><input type="checkbox" id="txtOwnLayer"> Placer sur un calque « Légendes » (masquable avec l'œil)</label>
     <label class="sl"><span>Taille du texte <b id="txtSizeV">40</b> px</span><input id="txtSize" type="range" min="14" max="120" value="40"></label>
     <div class="brow"><label class="chk"><input type="checkbox" id="txtBold"> Gras</label><label class="chk"><input type="checkbox" id="txtItalic"> Italique</label><label class="chk"><input type="checkbox" id="txtBlack" checked> Texte noir</label></div>
     <canvas id="txtPrev" width="320" height="130"></canvas>
@@ -224,8 +226,10 @@ input[type=text],select,textarea{width:100%;font:inherit;border:2px solid #cfe0d
       </div>
     </div>
     <div class="sec"><h3>Signature et export</h3>
-      <input id="sigName" type="text" maxlength="60" placeholder="Nom ou pseudonyme">
-      <div class="brow"><label class="chk"><input type="checkbox" id="sigOn" checked> Signature</label><label class="chk"><input type="checkbox" id="sigWm" checked> Filigrane</label></div>
+      <label for="sigName" style="font-size:.8rem;font-weight:700;color:#35514a">Nom du créateur (obligatoire pour exporter)</label>
+      <input id="sigName" type="text" maxlength="60" placeholder="Ton nom ou pseudonyme">
+      <p class="hint">Chaque export porte une signature fixe : « NOUTALA » suivi de ton nom, puis « AfriBD Studio by Elpidjio KPOTSI ». Elle n'est pas modifiable dans l'offre gratuite.</p>
+      <div class="brow"><label class="chk"><input type="checkbox" id="sigWm" checked> Filigrane diagonal</label></div>
       <div class="brow"><button id="exportBtn" class="primary">⬇️ Exporter en PNG</button></div>
     </div>
     <div class="sec"><h3>Projet</h3>
@@ -798,12 +802,12 @@ function renderTextCanvas(o){
  const bub=o.bubble,maxW=bub==='none'?760:Math.max(180,Math.min(520,o.size*13)),lines=[];
  String(o.text||' ').split('\n').forEach(par=>{let cur='';par.split(/\s+/).forEach(wd=>{const t=cur?cur+' '+wd:wd;if(cur&&meas.measureText(t).width>maxW){lines.push(cur);cur=wd}else cur=t});lines.push(cur)});
  const lh=Math.round(o.size*1.22),tw=Math.max(10,...lines.map(l=>meas.measureText(l).width)),th=lines.length*lh;
- const LW=5,TL=(bub==='none'||o.tail==='none')?0:46;
+ const LW=5,TL=(bub==='none'||bub==='legend'||o.tail==='none')?0:46;
  let rx,ry;
  if(bub==='oval'){rx=tw/2*1.42+12;ry=th/2*1.42+10}
  else if(bub==='thought'){rx=tw/2*1.65+18;ry=th/2*1.65+16}
  else if(bub==='shout'){rx=tw/2*1.9+24;ry=th/2*1.95+20}
- else if(bub==='round'||bub==='square'){rx=tw/2+24;ry=th/2+18}
+ else if(bub==='round'||bub==='square'||bub==='legend'){rx=tw/2+24;ry=th/2+18}
  else{rx=tw/2+6;ry=th/2+4}
  const m=TL+LW*2+18,cw=Math.ceil(2*rx+2*m),ch=Math.ceil(2*ry+2*m),cx=cw/2,cy=ch/2;
  const c=document.createElement('canvas');c.width=cw;c.height=ch;const g=c.getContext('2d');
@@ -811,7 +815,7 @@ function renderTextCanvas(o){
   const B=new Path2D();let Tl=null;
   if(bub==='oval')B.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
   else if(bub==='round'){const r=26,x=cx-rx,y=cy-ry,w=2*rx,h=2*ry;B.moveTo(x+r,y);B.arcTo(x+w,y,x+w,y+h,r);B.arcTo(x+w,y+h,x,y+h,r);B.arcTo(x,y+h,x,y,r);B.arcTo(x,y,x+w,y,r);B.closePath()}
-  else if(bub==='square')B.rect(cx-rx,cy-ry,2*rx,2*ry);
+  else if(bub==='square'||bub==='legend')B.rect(cx-rx,cy-ry,2*rx,2*ry);
   else if(bub==='thought'){
    const n=11,r=((rx+ry)/2*0.72*2*Math.PI/n)*0.78;
    for(let i=0;i<n;i++){const a=i/n*Math.PI*2,px=cx+rx*0.72*Math.cos(a),py=cy+ry*0.72*Math.sin(a);B.moveTo(px+r,py);B.arc(px,py,r,0,Math.PI*2)}
@@ -831,7 +835,7 @@ function renderTextCanvas(o){
     Tl.moveTo(bx(phi-0.3),by(phi-0.3));Tl.lineTo(cx+dx*(edge+TL),cy+dy*(edge+TL));Tl.lineTo(bx(phi+0.3),by(phi+0.3));Tl.closePath();
    }
   }
-  g.lineJoin='round';g.lineCap='round';g.lineWidth=LW*2;g.strokeStyle='#111';g.fillStyle='#fff';
+  g.lineJoin='round';g.lineCap='round';g.lineWidth=LW*2;g.strokeStyle='#111';g.fillStyle=bub==='legend'?'#fff1a8':'#fff';
   const parts=[B,Tl].filter(Boolean);parts.forEach(p=>g.stroke(p));parts.forEach(p=>g.fill(p));
  }
  g.font=fs;g.textAlign='center';g.textBaseline='middle';
@@ -849,9 +853,33 @@ function renderTxtPreview(){
  g.clearRect(0,0,p.width,p.height);g.drawImage(c,(p.width-c.width*k)/2,(p.height-c.height*k)/2,c.width*k,c.height*k);
 }
 ['txt','txtFont','txtBubble','txtTail','txtSize','txtBold','txtItalic','txtBlack'].forEach(id=>{$(id).addEventListener('input',()=>{$('txtSizeV').textContent=$('txtSize').value;renderTxtPreview()});$(id).addEventListener('change',renderTxtPreview)});
+function legendLayerIndex(){let i=layers.findIndex(l=>l.name==='Légendes');if(i<0){layers.push(makeLayer('Légendes'));i=layers.length-1}return i}
+$('txtLegend').onclick=()=>{
+ $('txtBubble').value='legend';$('txtTail').value='none';$('txtFont').value='sans';$('txtBold').checked=true;$('txtItalic').checked=false;$('txtBlack').checked=true;
+ $('txtSize').value=30;$('txtSizeV').textContent='30';$('txtOwnLayer').checked=true;
+ if(!$('txt').value.trim()||$('txt').value==='Texte')$('txt').value='Lieu — le matin';
+ renderTxtPreview();
+};
+$('txtLastPlace').onclick=()=>{
+ let name='';
+ try{const sc=JSON.parse(localStorage.getItem('afribd_studio_scenes_v1')||'[]');const last=Array.isArray(sc)?sc[sc.length-1]:null;name=last&&last.lieuLabel&&last.lieuLabel!=='lieu libre'?last.lieuLabel:''}catch(e){}
+ if(!name){toast('Aucun lieu trouvé : enregistre une scène avec un lieu dans l’atelier, ou écris-le à la main.');return}
+ const t=$('txt').value.trim(),parts=t.split(' — ');
+ $('txt').value=name+(parts.length>1?' — '+parts.slice(1).join(' — '):' — le matin');renderTxtPreview();
+};
+$('txtLastAddr').onclick=()=>{
+ let rue='',lieu='';
+ try{const sc=JSON.parse(localStorage.getItem('afribd_studio_scenes_v1')||'[]');const last=Array.isArray(sc)?sc[sc.length-1]:null;if(last){rue=last.rueLabel||'';lieu=last.lieuLabel&&last.lieuLabel!=='lieu libre'?last.lieuLabel:''}}catch(e){}
+ if(!rue&&!lieu){toast('Aucune adresse trouvée : choisis une rue ou un lieu dans l’atelier de scènes puis enregistre la scène.');return}
+ const t=$('txt').value.trim(),parts=t.split(' — ');
+ $('txt').value=[rue,lieu].filter(Boolean).join(', ')+(parts.length>1?' — '+parts.slice(1).join(' — '):' — le matin');renderTxtPreview();
+};
 $('txtPlace').onclick=()=>{
- const L=layers[active];if(!L.visible){toast('Ce calque est masqué.');return}
- settle();const c=renderTextCanvas(textOpts()),pos=textPos||viewCenter();
+ settle();
+ let L=layers[active];
+ if($('txtOwnLayer').checked){active=legendLayerIndex();L=layers[active];L.visible=true;buildLayers()}
+ if(!L.visible){toast('Ce calque est masqué.');return}
+ const c=renderTextCanvas(textOpts()),pos=textPos||(textOpts().bubble==='legend'?{x:c.width/2+24,y:c.height/2+24}:viewCenter());
  makeFloat(c,pos.x,pos.y,L,'new',null,null);closeSheet();toast('Place le texte, puis ✓ Valider');
 };
 
@@ -876,17 +904,34 @@ function applyLefty(on){document.body.classList.toggle('lefty',on)}
 $('leftyOn').onchange=e=>{applyLefty(e.target.checked);try{localStorage.setItem(LEFTY_KEY,e.target.checked?'1':'0')}catch(err){}};
 
 /* ---------- export ---------- */
+const STUDIO_SIG='AfriBD Studio by Elpidjio KPOTSI';
 function branding(g){
  const name=$('sigName').value.trim();g.save();g.textBaseline='middle';
- if($('sigWm').checked){g.globalAlpha=.18;g.fillStyle='#243b30';g.font='bold 38px system-ui,sans-serif';g.textAlign='center';g.translate(W/2,H/2);g.rotate(-Math.PI/6);g.fillText(name||'AfriBD Studio',0,0,1000);g.setTransform(1,0,0,1,0,0);g.globalAlpha=1}
- if($('sigOn').checked&&name){const t='Création : '+name;g.font='italic 600 18px system-ui,sans-serif';g.textAlign='right';g.lineWidth=3;g.strokeStyle='rgba(255,255,255,.85)';g.strokeText(t,W-24,H-30,830);g.fillStyle='#17251f';g.fillText(t,W-24,H-30,830)}
+ if($('sigWm').checked){g.globalAlpha=.16;g.fillStyle='#243b30';g.font='bold 38px system-ui,sans-serif';g.textAlign='center';g.translate(W/2,H/2);g.rotate(-Math.PI/6);g.fillText('NOUTALA '+name,0,0,1000);g.setTransform(1,0,0,1,0,0);g.globalAlpha=1}
+ const l1='NOUTALA '+name,l2=STUDIO_SIG;
+ g.font='bold 24px system-ui,sans-serif';const w1=g.measureText(l1).width;
+ g.font='600 17px system-ui,sans-serif';const w2=g.measureText(l2).width;
+ const bw=Math.min(W-40,Math.max(w1,w2)+36),bh=66,x=W-bw-20,y=H-bh-20;
+ g.fillStyle='rgba(255,255,255,.92)';g.strokeStyle='#17251f';g.lineWidth=3;
+ g.beginPath();g.roundRect?g.roundRect(x,y,bw,bh,12):g.rect(x,y,bw,bh);g.fill();g.stroke();
+ g.fillStyle='#0b7a4b';g.fillRect(x+3,y+bh-9,bw-6,6);
+ g.textAlign='center';g.fillStyle='#17251f';
+ g.font='bold 24px system-ui,sans-serif';g.fillText(l1,x+bw/2,y+22,bw-24);
+ g.font='600 17px system-ui,sans-serif';g.fillText(l2,x+bw/2,y+46,bw-24);
  g.restore();
 }
-function saveSig(){try{localStorage.setItem('noutala_sig_v1',JSON.stringify({n:$('sigName').value,s:$('sigOn').checked,w:$('sigWm').checked}))}catch(e){}}
-try{const s=JSON.parse(localStorage.getItem('noutala_sig_v1')||'null');if(s){$('sigName').value=s.n||'';$('sigOn').checked=s.s!==false;$('sigWm').checked=s.w!==false}}catch(e){}
-['sigName','sigOn','sigWm'].forEach(id=>$(id).addEventListener('change',saveSig));
+function saveSig(){
+ try{localStorage.setItem('noutala_sig_v1',JSON.stringify({n:$('sigName').value,w:$('sigWm').checked}))}catch(e){}
+ try{const c=JSON.parse(localStorage.getItem('afribd_credit_v1')||'null')||{};c.creator=$('sigName').value;localStorage.setItem('afribd_credit_v1',JSON.stringify(c))}catch(e){}
+}
+try{const s=JSON.parse(localStorage.getItem('noutala_sig_v1')||'null');if(s){$('sigName').value=s.n||'';$('sigWm').checked=s.w!==false}}catch(e){}
+try{if(!$('sigName').value){const c=JSON.parse(localStorage.getItem('afribd_credit_v1')||'null');if(c&&c.creator)$('sigName').value=c.creator}}catch(e){}
+['sigName','sigWm'].forEach(id=>$(id).addEventListener('change',saveSig));$('sigName').addEventListener('input',saveSig);
 function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),3000)}
-$('exportBtn').onclick=()=>{settle();const o=newCanvas(),g=o.getContext('2d');composeTo(g,true,false);branding(g);o.toBlob(b=>{if(b){downloadBlob(b,'noutala-dessin.png');toast('PNG exporté')}else toast('Export impossible.')},'image/png')};
+$('exportBtn').onclick=()=>{
+ settle();
+ if(!$('sigName').value.trim()){toast('Écris d’abord ton nom de créateur : la signature « NOUTALA … » est obligatoire.');$('sigName').focus();return}
+ const o=newCanvas(),g=o.getContext('2d');composeTo(g,true,false);branding(g);o.toBlob(b=>{if(b){downloadBlob(b,'noutala-dessin.png');toast('PNG exporté')}else toast('Export impossible.')},'image/png')};
 
 /* ---------- projet et sauvegarde automatique ---------- */
 function layerCanvasFor(L){if(fl&&fl.L===L){const c=newCanvas();c.getContext('2d').drawImage(L.canvas,0,0);drawFloat(c.getContext('2d'),fl);return c}return L.canvas}
