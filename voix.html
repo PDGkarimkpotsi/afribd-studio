@@ -47,10 +47,11 @@ button:active{transform:scale(.97)}
 .line i{font-style:normal;font-weight:800;color:var(--green)}
 @media(max-width:560px){.row{grid-template-columns:1fr}}
 </style>
+<script>if(/[?&]embed=1/.test(location.search))document.write('<style>header{display:none}main{margin-top:0}</style>')</script>
 </head>
 <body>
 <header><div class="wrap">
-  <a class="back" href="index.html">← Atelier de scènes</a>
+  <a class="back" href="index.html">← Atelier de scènes</a><a class="back" href="montage.html">🎬 Atelier de montage</a>
   <h1>🎙️ Studio de voix</h1>
   <p>Fais lire tes dialogues par des voix d'enfants, d'ados, d'adultes et de personnes âgées, féminines ou masculines, avec le générique de ta production.</p>
 </div></header>
@@ -74,10 +75,11 @@ button:active{transform:scale(.97)}
     <label for="creator">Nom du créateur *</label>
     <div class="row" style="grid-template-columns:auto 1fr;align-items:center"><span class="pill">NOUTALA</span><input id="creator" maxlength="50" placeholder="Ton nom ou pseudonyme"></div>
     <label for="studio">Nom du studio</label>
-    <div class="row" style="grid-template-columns:1fr auto;align-items:center"><input id="studio" maxlength="50" value="AfriBD Studio"><span class="pill">by Elpidjio KPOTSI</span></div>
+    <div class="row" style="grid-template-columns:1fr auto;align-items:center"><input id="studio" value="AfriBD Studio" readonly aria-readonly="true" style="background:#eef3ef"><span class="pill">by Elpidjio KPOTSI</span></div>
     <label for="pos">Position du générique</label>
     <select id="pos"><option value="fin">À la fin</option><option value="debut">Au début</option><option value="both">Au début et à la fin</option></select>
     <div class="credit"><div class="l1" id="cr1"></div><div class="l2" id="cr2"></div></div>
+    <p class="small"><b>Le générique n'est jamais lu à voix haute</b> : il est seulement affiché (script et atelier de montage). Le nom du studio est fixe.</p>
     <p class="small">Le nom du créateur est toujours précédé de « NOUTALA », et le studio toujours suivi de « by Elpidjio KPOTSI ».</p>
   </section>
 
@@ -112,7 +114,7 @@ const RM=/male|homme|thomas|paul|nicolas|henri|antoine|daniel|claude|jean|mathie
 const synth=('speechSynthesis' in window)?window.speechSynthesis:null;
 let devVoices=[],assign={},playing=false,paused=false,queue=[],qi=0;
 try{assign=JSON.parse(localStorage.getItem(KEYV)||'{}')||{}}catch(e){assign={}}
-try{const c=JSON.parse(localStorage.getItem(KEYC)||'null');if(c){$('creator').value=c.creator||'';$('studio').value=c.studio||'AfriBD Studio';$('genOn').checked=c.on!==false;$('pos').value=c.pos||'fin'}}catch(e){}
+try{const c=JSON.parse(localStorage.getItem(KEYC)||'null');if(c){$('creator').value=c.creator||'';$('studio').value='AfriBD Studio';$('genOn').checked=c.on!==false;$('pos').value=c.pos||'fin'}}catch(e){}
 try{$('dlg').value=localStorage.getItem('afribd_last_dialogue')||''}catch(e){}
 if(!synth)$('support').hidden=false;
 
@@ -171,22 +173,20 @@ function speak(text,a,done){
  synth.speak(u);
 }
 function creditLines(){
- const c=$('creator').value.trim(),s=$('studio').value.trim()||'AfriBD Studio';
+ const c=$('creator').value.trim(),s='AfriBD Studio';
  return {l1:'NOUTALA '+(c||'…'),l2:s+' by Elpidjio KPOTSI',spoken:'NOUTALA '+c+'. '+s+', by Elpidjio KPOTSI.'};
 }
 function renderCredit(){
  const c=creditLines();$('cr1').textContent=c.l1;$('cr2').textContent=c.l2;
  const box=document.querySelector('.credit');box.hidden=!$('genOn').checked;
- try{localStorage.setItem(KEYC,JSON.stringify({creator:$('creator').value,studio:$('studio').value,on:$('genOn').checked,pos:$('pos').value}))}catch(e){}
+ try{localStorage.setItem(KEYC,JSON.stringify({creator:$('creator').value,studio:'AfriBD Studio',on:$('genOn').checked,pos:$('pos').value}))}catch(e){}
 }
 ['creator','studio','genOn','pos'].forEach(id=>{$(id).addEventListener('input',renderCredit);$(id).addEventListener('change',renderCredit)});
 $('dlg').addEventListener('input',()=>{clearTimeout(window._t);window._t=setTimeout(()=>{renderSpeakers();renderLines()},400)});
 
 function buildQueue(){
- const items=[],gen=$('genOn').checked,pos=$('pos').value,c=creditLines();
- if(gen&&(pos==='debut'||pos==='both'))items.push({who:'Narrateur',text:c.spoken,label:'Générique'});
+ const items=[];
  parse().forEach(x=>items.push({who:x.who,text:x.text,label:x.who}));
- if(gen&&(pos==='fin'||pos==='both'))items.push({who:'Narrateur',text:c.spoken,label:'Générique'});
  return items;
 }
 function renderLines(){
@@ -223,7 +223,7 @@ $('stop').onclick=()=>{playing=false;paused=false;$('pause').textContent='⏸ Pa
 $('dl').onclick=()=>{
  if(!checkReady())return;
  const c=creditLines();let t='';
- if($('genOn').checked)t+=c.l1+'\n'+c.l2+'\n\n';
+ if($('genOn').checked)t+='[Générique affiché, jamais lu] '+c.l1+' — '+c.l2+'\n\n';
  buildQueue().forEach(x=>{const p=prof((assign[x.who]||{}).profile);t+='['+x.label+' — '+p.t+'] '+x.text+'\n'});
  const blob=new Blob([t],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');
  a.href=URL.createObjectURL(blob);a.download='afribd-script-voix.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
