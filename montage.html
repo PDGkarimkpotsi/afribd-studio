@@ -53,6 +53,7 @@ button:disabled{opacity:.45;cursor:default}
 .vb{position:absolute;height:28px;border-radius:7px;background:#7bc4f5;border:2px solid #1e88e5;font-size:.72rem;font-weight:700;padding:3px 6px;overflow:hidden;white-space:nowrap;cursor:pointer;color:#06304f}
 .vb.ex{background:#f7c98a;border-color:#e08a1e;color:#4d2d00}
 .vb.mu{background:#a8e0b0;border-color:#2e9e4a;color:#0d3a1a}
+.vb.ov{background:#f7b8d8;border-color:#d63384;color:#4a0a2a}
 .vb.on{outline:3px solid var(--orange)}
 .ph{position:absolute;top:0;bottom:0;width:2px;background:var(--red);pointer-events:none;z-index:3}
 .bar{height:12px;background:#eee;border-radius:8px;overflow:hidden;margin-top:10px}
@@ -75,10 +76,12 @@ iframe{width:100%;height:calc(100vh - 150px);min-height:560px;border:0;border-ra
   <section class="card">
     <h2>1. Vidéos</h2>
     <div class="buttons" style="margin-top:0"><label class="btn primary" for="file" id="impBtn">📥 Importer une vidéo</label>
-    <label class="btn secondary" for="fileImg">🖼 Ajouter des images</label></div>
-    <input type="file" id="file" accept="video/*" multiple hidden><input type="file" id="fileImg" accept="image/*" multiple hidden>
-    <p class="small">Les images sont insérées à la position de la tête de lecture (au milieu d'une vidéo, elle est coupée en deux). Tu peux aussi faire un montage avec des images seulement.</p>
-    <div class="notice">Le montage n'est pas sauvegardé : exporte ta vidéo avant de quitter la page. Garde des vidéos courtes (2 à 3 minutes) pour que ton téléphone suive.</div>
+    <label class="btn secondary" for="fileImg">🖼 Ajouter des images</label>
+    <label class="btn secondary" for="fileIns">🎞 Insérer une vidéo ici</label></div>
+    <input type="file" id="file" accept="video/*" multiple hidden><input type="file" id="fileImg" accept="image/*" multiple hidden><input type="file" id="fileIns" accept="video/*" multiple hidden>
+    <p class="small">Les images ajoutées ici sont insérées à la position de la tête de lecture (au milieu d'une vidéo, elle est coupée en deux). Pour coller une image par-dessus une vidéo sans la couper ni couper le son, utilise la section 3. « Insérer une vidéo ici » place une autre vidéo à la tête de lecture (la vidéo en cours est coupée en deux si besoin).</p>
+    <div class="notice">Le montage (vidéos, images, voix, sélection) est sauvegardé automatiquement dans ce navigateur : tu le retrouves en revenant sur la page. Exporte quand même ta vidéo finale. Garde des vidéos courtes (2 à 3 minutes) pour que ton téléphone suive.</div>
+    <div class="buttons"><button class="danger" id="bReset">🧹 Vider le montage</button></div>
     <div class="cvwrap" style="margin-top:10px"><canvas id="cv" width="1280" height="720"></canvas></div>
     <div class="tr">
       <button class="secondary" id="bBack" aria-label="Reculer d'une seconde">⏪ 1 s</button>
@@ -133,7 +136,39 @@ iframe{width:100%;height:calc(100vh - 150px);min-height:560px;border:0;border-ra
   </section>
 
   <section class="card c3">
-    <h2>3. Voix et pistes audio</h2>
+    <h2>3. Images et personnages par-dessus la vidéo</h2>
+    <div class="buttons" style="margin-top:0"><label class="btn secondary" for="fileOv">🖼 Coller une image sur la vidéo</label></div>
+    <input type="file" id="fileOv" accept="image/*" multiple hidden>
+    <p class="small">L'image est posée à la position de la tête de lecture. La vidéo et son son continuent sans aucune coupure. Pour animer un personnage, importe un dessin PNG détouré (fond transparent) et pose-le sur ton décor (vidéo ou image).</p>
+    <div class="lane" id="laneO"></div>
+    <div class="sel" id="ovSel" hidden>
+      <b id="ovName"></b> <span class="small" id="ovInfo"></span>
+      <label for="ovStart">Début : <span id="ovStartV">0</span> s</label>
+      <input type="range" id="ovStart" min="0" max="1" step="0.1" value="0">
+      <label for="ovDur">Durée d'affichage : <span id="ovDurV">3</span> s</label>
+      <input type="range" id="ovDur" min="0.5" max="60" step="0.5" value="3">
+      <label for="ovX">Position horizontale</label><input type="range" id="ovX" min="0" max="100" value="50">
+      <label for="ovY">Position verticale</label><input type="range" id="ovY" min="0" max="100" value="50">
+      <label for="ovW">Taille</label><input type="range" id="ovW" min="5" max="100" value="30">
+      <label for="ovAnim">Animation</label>
+      <select id="ovAnim"><option value="none">Aucune</option><option value="float">Flottement (haut-bas)</option><option value="breath">Respiration</option><option value="sway">Balancement</option><option value="shake">Secousse</option><option value="pop">Apparition (zoom)</option><option value="move">Glissement vers une position</option><option value="walk">Marche vers une position</option></select>
+      <div id="ovMove" hidden>
+        <label for="ovX2">Arrivée : position horizontale</label><input type="range" id="ovX2" min="0" max="100" value="80">
+        <label for="ovY2">Arrivée : position verticale</label><input type="range" id="ovY2" min="0" max="100" value="50">
+        <p class="small">Cadre orange = départ, cadre bleu = arrivée (en pause).</p>
+      </div>
+      <label for="ovSpd">Vitesse de l'animation : <span id="ovSpdV">1.0</span> ×</label>
+      <input type="range" id="ovSpd" min="0.5" max="3" step="0.1" value="1">
+      <label class="chk"><input type="checkbox" id="ovFlip"> Retourner l'image (miroir)</label>
+      <div class="buttons">
+        <button class="secondary" id="ovHere">📍 Placer à la tête de lecture</button>
+        <button class="danger" id="ovDel">🗑 Supprimer</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card c3">
+    <h2>4. Voix et pistes audio</h2>
     <div class="buttons" style="margin-top:0">
       <button class="rec" id="bRec">🎙 Enregistrer ma voix ici</button>
       <label class="btn secondary" for="fileMus">🎵 Ajouter une musique</label><input type="file" id="fileMus" accept="audio/*" hidden>
@@ -145,6 +180,11 @@ iframe{width:100%;height:calc(100vh - 150px);min-height:560px;border:0;border-ra
       <b id="vName"></b> <span class="small" id="vInfo"></span>
       <label for="vVol">Volume : <span id="vVolV">100</span> %</label>
       <input type="range" id="vVol" min="0" max="200" value="100">
+      <label class="chk"><input type="checkbox" id="vCover"> Faire durer ce son sous le générique de fin (fondu à la fin)</label>
+      <label for="vPitch">Hauteur de la voix : <span id="vPitchV">0</span> demi-tons</label>
+      <input type="range" id="vPitch" min="-6" max="6" step="0.5" value="0">
+      <div class="buttons"><button class="secondary" id="vPitchGo">🎚 Appliquer la hauteur</button></div>
+      <p class="small">Garde la voix humaine et la même durée. Reste entre −3 et +3 pour un rendu naturel ; au-delà, la voix devient artificielle. Pour changer la voix d'une vidéo, sépare d'abord sa piste audio (section 2), puis règle le bloc orange. Mets 0 pour revenir à l'original.</p>
       <div class="buttons">
         <button class="secondary" id="vHear">▶ Écouter</button>
         <button class="secondary" id="vBack">◀ −0,1 s</button>
@@ -158,11 +198,13 @@ iframe{width:100%;height:calc(100vh - 150px);min-height:560px;border:0;border-ra
   </section>
 
   <section class="card c4">
-    <h2>4. Générique</h2>
+    <h2>5. Générique</h2>
     <p class="small">Le nom du studio s'affiche automatiquement au début et à la fin de la vidéo. Il n'est pas modifiable.</p>
     <div class="buttons" style="margin-top:6px"><span class="pill">AfriBD Studio</span><span class="pill">by Elpidjio KPOTSI</span></div>
-    <label for="creator">Nom du créateur * (affiché à la fin)</label>
-    <div style="display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:center"><span class="pill">NOUTALA</span><input type="text" id="creator" maxlength="50" placeholder="Ton nom ou pseudonyme"></div>
+    <label for="prefix">Signature devant le nom du créateur</label>
+    <select id="prefix"><option value="NOUTALA">NOUTALA (par défaut)</option><option value="Afribd-studio Prod">Afribd-studio Prod</option></select>
+    <label for="creator">Nom du créateur * (affiché au début et à la fin)</label>
+    <input type="text" id="creator" maxlength="50" placeholder="Ton nom ou pseudonyme">
     <label for="title">Titre de la vidéo (facultatif, affiché au début)</label>
     <input type="text" id="title" maxlength="60" placeholder="Ex. : Le marché de Lomé">
     <label for="credits">Lignes du générique de fin (une par ligne, colle ton texte)</label>
@@ -175,7 +217,7 @@ iframe{width:100%;height:calc(100vh - 150px);min-height:560px;border:0;border-ra
   </section>
 
   <section class="card">
-    <h2>5. Exporter</h2>
+    <h2>6. Exporter</h2>
     <label style="margin-top:0">Format de la vidéo</label>
     <div class="buttons" style="margin-top:0"><label class="chk" style="margin:0"><input type="radio" name="fmt" id="fmtW" value="webm" checked> .webm</label><label class="chk" style="margin:0"><input type="radio" name="fmt" id="fmtM" value="mp4"> .mp4 (si possible)</label></div>
     <p class="small" id="fmtInfo"></p>
@@ -201,7 +243,7 @@ const KEYC='afribd_credit_v1',KEYM='afribd_montage_v1',STUDIO='AfriBD Studio',BY
 const cv=$('cv'),cx=cv.getContext('2d');
 let CW=1280,CH=720;
 let AC=null,master,spk,dest,V=[],act=0;
-let clips=[],voices=[],selClip=-1,selVoice=-1,uid=1,filmDur=0;
+let clips=[],voices=[],overlays=[],selClip=-1,selVoice=-1,selOv=-1,uid=1,filmDur=0,restoring=false;
 let ph=0,playing=false,busy=false,segs=[],si=0,cardT0=0,ft=0,raf=0,prep=null,seekTok=0;
 let exporting=false,cancelFlag=false,endRes=null,rec=null,monMul=1;
 let live=[],started=new Set();
@@ -211,12 +253,14 @@ function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');cle
 
 /* ---------- réglages (créateur partagé avec la page de voix) ---------- */
 try{const c=JSON.parse(localStorage.getItem(KEYC)||'null');if(c)$('creator').value=c.creator||''}catch(e){}
-try{const m=JSON.parse(localStorage.getItem(KEYM)||'null');if(m){$('title').value=m.title||'';$('credits').value=m.credits||''}}catch(e){}
+try{const m=JSON.parse(localStorage.getItem(KEYM)||'null');if(m){$('title').value=m.title||'';$('credits').value=m.credits||'';if(m.prefix==='Afribd-studio Prod')$('prefix').value=m.prefix}}catch(e){}
+const prefixTxt=()=>$('prefix').value||'NOUTALA';
 function saveSettings(){
  try{let c={};try{c=JSON.parse(localStorage.getItem(KEYC)||'{}')||{}}catch(e){}c.creator=$('creator').value;c.studio=STUDIO;if(c.on===undefined)c.on=true;if(!c.pos)c.pos='both';localStorage.setItem(KEYC,JSON.stringify(c));
-  localStorage.setItem(KEYM,JSON.stringify({title:$('title').value,credits:$('credits').value}))}catch(e){}
+  localStorage.setItem(KEYM,JSON.stringify({title:$('title').value,credits:$('credits').value,prefix:$('prefix').value}))}catch(e){}
 }
 ['creator','title','credits'].forEach(id=>$(id).addEventListener('input',saveSettings));
+$('prefix').addEventListener('change',saveSettings);
 
 /* ---------- audio ---------- */
 function mkVid(){
@@ -265,11 +309,36 @@ function drawMedia(el,w,h,c,frac){
 }
 function drawFrame(v,c){drawMedia(v,v.videoWidth,v.videoHeight,c)}
 function drawImg(c,frac){drawMedia(c.img,c.img.naturalWidth,c.img.naturalHeight,c,frac)}
+function ovRect(o){const w=o.w*CW,h=w*o.img.naturalHeight/Math.max(1,o.img.naturalWidth);return{x:o.x*CW-w/2,y:o.y*CH-h/2,w,h}}
+const ease=p=>p*p*(3-2*p),backOut=p=>{const c=1.70158;return 1+(c+1)*Math.pow(p-1,3)+c*Math.pow(p-1,2)};
+function ovAnimState(o,t){
+ const k=Math.max(0,t-o.start),s=o.spd||1,f=clamp(k/Math.max(0.1,o.dur),0,1),TAU=Math.PI*2,a=o.anim||'none';
+ const st={x:o.x,y:o.y,sc:1,rot:0,al:1};
+ if(a==='float')st.y+=Math.sin(k*s*TAU*0.6)*0.03;
+ else if(a==='breath')st.sc=1+Math.sin(k*s*TAU*0.5)*0.04;
+ else if(a==='sway')st.rot=Math.sin(k*s*TAU*0.6)*0.12;
+ else if(a==='shake'){st.x+=Math.sin(k*s*40)*0.008;st.y+=Math.cos(k*s*53)*0.006}
+ else if(a==='pop'){const p=clamp(k*s/0.5,0,1);st.sc=Math.max(0.01,backOut(p));st.al=Math.min(1,p*2)}
+ else if(a==='move'||a==='walk'){const e=ease(f),x2=o.x2==null?.8:o.x2,y2=o.y2==null?.5:o.y2;st.x=o.x+(x2-o.x)*e;st.y=o.y+(y2-o.y)*e;if(a==='walk'){st.y-=Math.abs(Math.sin(k*s*TAU*1.1))*0.025;st.rot=Math.sin(k*s*TAU*1.1)*0.05}}
+ return st;
+}
+function drawOverlays(t,guide){
+ overlays.forEach((o,i)=>{
+  if(t<o.start||t>=o.start+o.dur)return;
+  const st=ovAnimState(o,t),r=ovRect(o);
+  cx.save();cx.globalAlpha=st.al;cx.translate(st.x*CW,st.y*CH);cx.rotate(st.rot);cx.scale(o.flip?-st.sc:st.sc,st.sc);cx.drawImage(o.img,-r.w/2,-r.h/2,r.w,r.h);cx.restore();
+  if(guide&&i===selOv){cx.save();cx.setLineDash([14,9]);cx.lineWidth=4;cx.strokeStyle='#ff6b2c';cx.strokeRect(r.x,r.y,r.w,r.h);
+   if(o.anim==='move'||o.anim==='walk'){cx.strokeStyle='#1e88e5';cx.strokeRect((o.x2==null?.8:o.x2)*CW-r.w/2,(o.y2==null?.5:o.y2)*CH-r.h/2,r.w,r.h)}
+   cx.restore()}
+ });
+}
 function drawBlank(){cx.fillStyle='#10201a';cx.fillRect(0,0,CW,CH);cx.fillStyle='#ffe08a';cx.font='bold '+Math.round(34*CW/1280)+'px system-ui,sans-serif';cx.textAlign='center';cx.fillText('Importe une vidéo ou des images pour commencer',CW/2,CH/2);cx.textAlign='start'}
 function drawNow(){
+ scheduleSave();
  const c=clips[clipAt(ph)];
  if(!c||(!isImg(c)&&!V.length)){drawBlank();return}
  if(isImg(c))drawImg(c,clamp((ph-c.t0)/c.d,0,1));else drawFrame(V[act].v,c);
+ drawOverlays(ph,!exporting&&!playing);
  if(c===clips[selClip]&&c.zone&&c.zone.on&&FX[c.fx]&&!exporting&&!playing){cx.save();cx.setLineDash([14,9]);cx.lineWidth=4;cx.strokeStyle='#ffc21a';cx.beginPath();zonePath(c.zone);cx.stroke();cx.restore()}
 }
 async function seek(t){
@@ -298,11 +367,11 @@ function drawCard(w,t,d){
   let top=CH/2-40*S;
   if(logoImg){try{const k=Math.min(150*S/logoImg.height,300*S/logoImg.width);g.drawImage(logoImg,CW/2-logoImg.width*k/2,top-logoImg.height*k-10*S,logoImg.width*k,logoImg.height*k)}catch(e){}}
   y=top+40*S;line(STUDIO,Math.round(72*S),'#ffc21a',0,'800');line(BY,Math.round(34*S),'#ffffff',60*S,'600');
-  const cr=$('creator').value.trim();if(cr)line('NOUTALA '+cr,Math.round(38*S),'#ffc21a',112*S,'800');
+  const cr=$('creator').value.trim();if(cr)line(prefixTxt()+' '+cr,Math.round(38*S),'#ffc21a',112*S,'800');
   const ti=$('title').value.trim();if(ti)line(ti,Math.round(44*S),'#ffffff',(cr?180:150)*S,'700');
  }else{
   const L=creditLines(),n=L.length,total=(n?n*44*S+30*S:0)+150*S;let y0=CH/2-total/2;
-  y=y0;line('NOUTALA '+($('creator').value.trim()||'…'),Math.round(54*S),'#ffc21a',0,'800');
+  y=y0;line(prefixTxt()+' '+($('creator').value.trim()||'…'),Math.round(54*S),'#ffc21a',0,'800');
   line(STUDIO+' '+BY,Math.round(32*S),'#ffffff',58*S,'600');
   L.forEach((s,i)=>line(s,Math.round(30*S),'#e8efe9',130*S+i*44*S,'500'));
  }
@@ -315,12 +384,25 @@ const fullSegs=()=>[{k:'card',w:'intro',d:introDur()},...filmSegs(),{k:'card',w:
 function stopVoices(){live.forEach(l=>{try{l.src.stop()}catch(e){}});live=[];started.clear()}
 function launchVoice(vo,off){
  const s=AC.createBufferSource();s.buffer=vo.buf;const g=AC.createGain();g.gain.value=vo.vol;s.connect(g);g.connect(master);
- try{s.start(0,Math.max(0,off))}catch(e){return}live.push({src:s});started.add(vo.id);
+ try{s.start(0,Math.max(0,off))}catch(e){return}live.push({src:s,g,vo});started.add(vo.id);
+}
+/* sons marqués « sous le générique » : ils continuent pendant le générique de fin, avec un fondu */
+function outroSound(d){
+ const now=AC.currentTime;
+ live=live.filter(l=>{if(l.vo&&l.vo.cover)return true;try{l.src.stop()}catch(e){}return false});
+ voices.forEach(vo=>{
+  if(!vo.cover)return;
+  let l=live.find(x=>x.vo===vo);
+  if(!l){if(vo.start>filmDur)return;const off=((filmDur-vo.start)%vo.dur+vo.dur)%vo.dur;launchVoice(vo,off);l=live[live.length-1]}
+  if(!l)return;
+  const g=l.g.gain,fade=Math.min(2,d);
+  try{g.cancelScheduledValues(now);g.setValueAtTime(vo.vol,now);g.setValueAtTime(vo.vol,now+d-fade);g.linearRampToValueAtTime(0,now+d)}catch(e){}
+ });
 }
 function scheduleVoices(){voices.forEach(vo=>{if(!started.has(vo.id)&&ft>=vo.start-0.02&&ft<vo.start+vo.dur)launchVoice(vo,ft-vo.start)})}
 async function startSeg(i,local,keep){
  si=i;const s=segs[i];if(!keep)stopVoices();
- if(s.k==='card'){cardT0=performance.now()-local*1000;ft=s.w==='intro'?-1:filmDur+1;return}
+ if(s.k==='card'){cardT0=performance.now()-local*1000;ft=s.w==='intro'?-1:filmDur+1;if(s.w==='outro')outroSound(s.d-local);return}
  if(s.k==='img'){cardT0=performance.now()-local*1000;ft=s.c.t0+local;return}
  const a=V[act];await loadEl(a,s.c,s.c.in+local);a.g.gain.value=clipGain(s.c);
  ft=s.c.t0+local;try{await a.v.play()}catch(e){}
@@ -334,7 +416,7 @@ async function advance(){
  busy=true;const n=si+1;
  if(n>=segs.length){busy=false;finish();return}
  const s=segs[si],t=segs[n];
- if(t.k==='card'){V[act].v.pause();await startSeg(n,0)}
+ if(t.k==='card'){V[act].v.pause();await startSeg(n,0,t.w==='outro')}
  else if(t.k==='img'){V[act].v.pause();await startSeg(n,0,true)}
  else if(s.k==='clip'&&s.c.src===t.c.src&&Math.abs(t.c.in-s.c.out)<0.06){si=n;V[act].g.gain.value=clipGain(t.c)}
  else if(prep&&prep.idx===n){const o=act;act=prep.a;prep=null;si=n;V[act].g.gain.value=clipGain(t.c);try{await V[act].v.play()}catch(e){}V[o].v.pause()}
@@ -346,8 +428,8 @@ function tick(){
  if(!busy){
   const s=segs[si];let local;
   if(s.k==='card'){local=(performance.now()-cardT0)/1000;drawCard(s.w,local,s.d)}
-  else if(s.k==='img'){local=(performance.now()-cardT0)/1000;drawImg(s.c,clamp(local/s.d,0,1));ft=s.c.t0+Math.max(0,local);ph=ft}
-  else{const v=V[act].v;local=v.currentTime-s.c.in;drawFrame(v,s.c);ft=s.c.t0+Math.max(0,local);ph=ft}
+  else if(s.k==='img'){local=(performance.now()-cardT0)/1000;ft=s.c.t0+Math.max(0,local);ph=ft;drawImg(s.c,clamp(local/s.d,0,1));drawOverlays(ft,false)}
+  else{const v=V[act].v;local=v.currentTime-s.c.in;ft=s.c.t0+Math.max(0,local);ph=ft;drawFrame(v,s.c);drawOverlays(ft,false)}
   if((s.k==='clip'&&(local>=s.d-0.03||V[act].v.ended))||(s.k!=='clip'&&local>=s.d))advance();
   else{if(s.k!=='card')scheduleVoices();ui()}
  }
@@ -379,7 +461,7 @@ function ui(){
  $('tm').textContent=fmt(Math.max(0,ph))+' / '+fmt(filmDur);
  if(!dragSeek)$('seek').value=ph;
  $('bPlay').textContent=playing?'⏸ Pause':'▶ Lire';
- const pct=filmDur>0?clamp(ph/filmDur,0,1)*100:0;const p=$('lane').querySelector('.ph');if(p)p.style.left=pct+'%';
+ const pct=filmDur>0?clamp(ph/filmDur,0,1)*100:0;['lane','laneO'].forEach(id=>{const p=$(id).querySelector('.ph');if(p)p.style.left=pct+'%'});
  if(exporting){let tot=0,done=0;segs.forEach((s,k)=>{tot+=s.d;if(k<si)done+=s.d});const s=segs[si];if(s){const l=s.k==='clip'?V[act].v.currentTime-s.c.in:(performance.now()-cardT0)/1000;done+=clamp(l,0,s.d)}$('barI').style.width=clamp(done/Math.max(.1,tot)*100,0,100)+'%'}
 }
 function renderStrip(){
@@ -404,8 +486,20 @@ function renderLane(){
  const p=document.createElement('div');p.className='ph';lane.appendChild(p);
  lane.dataset.total=total;
  const v=voices[selVoice];$('voiceSel').hidden=!v;
- if(v){$('vName').textContent=v.name;$('vInfo').textContent='début '+fmt(v.start)+' · durée '+v.dur.toFixed(1)+' s';$('vVol').value=Math.round(v.vol*100);$('vVolV').textContent=Math.round(v.vol*100)}
- ui();
+ if(v){$('vName').textContent=v.name;$('vInfo').textContent='début '+fmt(v.start)+' · durée '+v.dur.toFixed(1)+' s';$('vVol').value=Math.round(v.vol*100);$('vVolV').textContent=Math.round(v.vol*100);$('vCover').checked=!!v.cover;$('vPitch').value=v.pitch||0;$('vPitchV').textContent=v.pitch||0}
+ renderOv();scheduleSave();ui();
+}
+function renderOv(){
+ const lane=$('laneO');lane.innerHTML='';const total=Math.max(filmDur,0.1);
+ const rowsEnd=[];const order=overlays.map((o,i)=>i).sort((a,b)=>overlays[a].start-overlays[b].start);
+ order.forEach(i=>{const o=overlays[i];let r=rowsEnd.findIndex(e=>e<=o.start+0.001);if(r<0){r=rowsEnd.length;rowsEnd.push(0)}rowsEnd[r]=o.start+o.dur;o.row=r});
+ lane.style.minHeight=Math.max(1,rowsEnd.length)*32+8+'px';
+ overlays.forEach((o,i)=>{const d=document.createElement('div');d.className='vb ov'+(i===selOv?' on':'');
+  d.style.left=Math.min(o.start/total*100,96)+'%';d.style.width=Math.max(Math.min(o.dur,Math.max(0.1,total-o.start))/total*100,3)+'%';d.style.top=(4+o.row*32)+'px';d.textContent='🖼 '+o.name;
+  d.onclick=()=>{selOv=i;renderOv();drawNow()};lane.appendChild(d)});
+ const p=document.createElement('div');p.className='ph';lane.appendChild(p);
+ const o=overlays[selOv];$('ovSel').hidden=!o;
+ if(o){$('ovName').textContent=o.name;$('ovStart').max=Math.max(0.1,filmDur);$('ovStart').value=o.start;$('ovStartV').textContent=o.start.toFixed(1);$('ovDur').value=o.dur;$('ovDurV').textContent=o.dur.toFixed(1);$('ovX').value=o.x*100;$('ovY').value=o.y*100;$('ovW').value=o.w*100;$('ovAnim').value=o.anim||'none';$('ovMove').hidden=!(o.anim==='move'||o.anim==='walk');$('ovX2').value=(o.x2==null?.8:o.x2)*100;$('ovY2').value=(o.y2==null?.5:o.y2)*100;$('ovSpd').value=o.spd||1;$('ovSpdV').textContent=(o.spd||1).toFixed(1);$('ovFlip').checked=!!o.flip}
 }
 function refresh(){layout();renderStrip();renderLane();ui()}
 
@@ -432,7 +526,7 @@ $('file').onchange=async e=>{
   try{
    const m=await probe(f);
    if(!clips.length){const portrait=m.h>m.w;CW=portrait?720:1280;CH=portrait?1280:720;cv.width=CW;cv.height=CH}
-   clips.push({id:uid++,name:f.name.replace(/\.[^.]+$/,'').slice(0,28),file:f,src:m.url,in:0,out:m.dur,vol:1,mute:false,fx:'',zone:newZone()});
+   clips.push({id:uid++,fk:'f'+(uid++),name:f.name.replace(/\.[^.]+$/,'').slice(0,28),file:f,src:m.url,in:0,out:m.dur,vol:1,mute:false,fx:'',zone:newZone()});
   }catch(err){toast('Impossible de lire « '+f.name+' » (format non pris en charge).')}
  }
  if(selClip<0&&clips.length)selClip=0;
@@ -458,8 +552,8 @@ $('bOut').onclick=()=>{
 $('bDel').onclick=()=>{const c=needClip();if(!c)return;if(playing)halt();clips.splice(selClip,1);selClip=Math.min(selClip,clips.length-1);refresh();seek(0)};
 $('bLeft').onclick=()=>{if(!needClip())return;if(selClip<1){toast('C’est déjà le premier clip.');return}if(playing)halt();[clips[selClip-1],clips[selClip]]=[clips[selClip],clips[selClip-1]];selClip--;refresh();seek(clips[selClip].t0)};
 $('bRight').onclick=()=>{if(!needClip())return;if(selClip>=clips.length-1){toast('C’est déjà le dernier clip.');return}if(playing)halt();[clips[selClip+1],clips[selClip]]=[clips[selClip],clips[selClip+1]];selClip++;refresh();seek(clips[selClip].t0)};
-$('cVol').oninput=e=>{const c=clips[selClip];if(!c)return;c.vol=e.target.value/100;$('cVolV').textContent=e.target.value;if(playing&&segs[si]&&segs[si].c===c)V[act].g.gain.value=clipGain(c)};
-$('cMute').onchange=e=>{const c=clips[selClip];if(!c)return;c.mute=e.target.checked;if(playing&&segs[si]&&segs[si].c===c)V[act].g.gain.value=clipGain(c)};
+$('cVol').oninput=e=>{const c=clips[selClip];if(!c)return;scheduleSave();c.vol=e.target.value/100;$('cVolV').textContent=e.target.value;if(playing&&segs[si]&&segs[si].c===c)V[act].g.gain.value=clipGain(c)};
+$('cMute').onchange=e=>{const c=clips[selClip];if(!c)return;scheduleSave();c.mute=e.target.checked;if(playing&&segs[si]&&segs[si].c===c)V[act].g.gain.value=clipGain(c)};
 $('bPlay').onclick=play;
 $('bBack').onclick=async()=>{const was=playing;if(was)halt();await seek(ph-1);if(was)play()};
 $('bFwd').onclick=async()=>{const was=playing;if(was)halt();await seek(ph+1);if(was)play()};
@@ -467,7 +561,7 @@ $('seek').addEventListener('input',e=>{dragSeek=true;if(playing)halt();seek(+e.t
 $('seek').addEventListener('change',()=>{dragSeek=false});
 
 /* ---------- voix et pistes ---------- */
-function addVoice(o){voices.push({id:uid++,name:o.name,buf:o.buf,start:o.start,dur:o.buf.duration,vol:1,kind:o.kind||'voix'});selVoice=voices.length-1;renderLane()}
+function addVoice(o){voices.push({id:uid++,name:o.name,buf:o.buf,start:o.start,dur:o.buf.duration,vol:1,kind:o.kind||'voix',cover:false,orig:o.buf,pitch:0});selVoice=voices.length-1;renderLane()}
 function pickAudioMime(){const L=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus'];return L.find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported(t))||''}
 async function recToggle(){
  if(rec){stopRec();return}
@@ -494,7 +588,8 @@ function stopRec(){
  try{r.mr.stop()}catch(e){}
 }
 $('bRec').onclick=recToggle;
-$('vVol').oninput=e=>{const v=voices[selVoice];if(!v)return;v.vol=e.target.value/100;$('vVolV').textContent=e.target.value};
+$('vVol').oninput=e=>{const v=voices[selVoice];if(!v)return;scheduleSave();v.vol=e.target.value/100;$('vVolV').textContent=e.target.value};
+$('vCover').onchange=e=>{const v=voices[selVoice];if(!v)return;v.cover=e.target.checked;scheduleSave();toast(v.cover?'Ce son continuera sous le générique de fin.':'Ce son s’arrêtera avant le générique de fin.')};
 $('vDel').onclick=()=>{if(!voices[selVoice])return;voices.splice(selVoice,1);selVoice=-1;renderLane()};
 const nudge=d=>{const v=voices[selVoice];if(!v)return;v.start=Math.max(0,+(v.start+d).toFixed(2));renderLane()};
 $('vBack').onclick=()=>nudge(-0.1);$('vFwd').onclick=()=>nudge(0.1);
@@ -549,7 +644,7 @@ $('fileImg').onchange=async e=>{
  const list=[];
  for(const f of fs){
   try{const url=URL.createObjectURL(f),img=await loadImg(url);
-   list.push({id:uid++,type:'img',name:f.name.replace(/\.[^.]+$/,'').slice(0,28),file:f,src:url,img,in:0,out:3,vol:1,mute:false,zoom:true,fx:'',zone:newZone()})}
+   list.push({id:uid++,fk:'f'+(uid++),type:'img',name:f.name.replace(/\.[^.]+$/,'').slice(0,28),file:f,src:url,img,in:0,out:3,vol:1,mute:false,zoom:true,fx:'',zone:newZone()})}
   catch(err){toast('Impossible de lire l’image « '+f.name+' ».')}
  }
  if(!list.length)return;
@@ -594,7 +689,7 @@ fmtInfo();
 $('bExport').onclick=async()=>{
  if(exporting)return;
  if(!clips.length){toast('Importe d’abord une vidéo.');return}
- if(!$('creator').value.trim()){alert('Renseigne le nom du créateur (il sera précédé de NOUTALA dans le générique).');$('creator').focus();return}
+ if(!$('creator').value.trim()){alert('Renseigne le nom du créateur (il sera précédé de « '+prefixTxt()+' » dans le générique).');$('creator').focus();return}
  if(!window.MediaRecorder||!cv.captureStream){alert('Ce navigateur ne permet pas l’export vidéo. Utilise Chrome sur Android.');return}
  if(rec)stopRec();if(playing)halt();
  ensureAudio();await AC.resume();saveSettings();
@@ -623,7 +718,149 @@ $('bCancel').onclick=()=>{if(!exporting)return;cancelFlag=true;halt();if(endRes)
 $('tabM').onclick=()=>{$('paneM').hidden=false;$('paneV').hidden=true;$('tabM').classList.add('on');$('tabV').classList.remove('on')};
 $('tabV').onclick=()=>{if(playing)halt();$('paneM').hidden=true;$('paneV').hidden=false;$('tabV').classList.add('on');$('tabM').classList.remove('on');const f=$('vframe');if(!f.src||f.src==='about:blank'||!f.dataset.on){f.dataset.on='1';f.src='voix.html?embed=1'}};
 
-drawBlank();refresh();
+/* ---------- images par-dessus la vidéo ---------- */
+$('fileOv').onchange=async e=>{
+ const fs=[...e.target.files];e.target.value='';if(!fs.length)return;
+ if(!clips.length){toast('Importe d’abord une vidéo.');return}
+ if(playing)halt();let n=0;
+ for(const f of fs){
+  try{const url=URL.createObjectURL(f),img=await loadImg(url);
+   overlays.push({id:uid++,name:f.name.replace(/\.[^.]+$/,'').slice(0,20),file:f,src:url,img,start:Math.max(0,+Math.min(ph,Math.max(0,filmDur-0.5)).toFixed(1)),dur:3,x:.5,y:.5,w:.3,anim:'none',spd:1,x2:.8,y2:.5,flip:false});selOv=overlays.length-1;n++}
+  catch(err){toast('Impossible de lire l’image « '+f.name+' ».')}
+ }
+ renderOv();drawNow();if(n)toast(n+' image(s) posée(s) sur la vidéo');
+};
+function ovUp(fn){return e=>{const o=overlays[selOv];if(!o)return;fn(o,+e.target.value);renderOvLabels();drawNow()}}
+function renderOvLabels(){const o=overlays[selOv];if(!o)return;$('ovStartV').textContent=o.start.toFixed(1);$('ovDurV').textContent=o.dur.toFixed(1)}
+$('ovStart').oninput=ovUp((o,v)=>{o.start=v});$('ovStart').onchange=()=>renderOv();
+$('ovDur').oninput=ovUp((o,v)=>{o.dur=v});$('ovDur').onchange=()=>renderOv();
+$('ovX').oninput=ovUp((o,v)=>{o.x=v/100});$('ovY').oninput=ovUp((o,v)=>{o.y=v/100});$('ovW').oninput=ovUp((o,v)=>{o.w=v/100});
+$('ovHere').onclick=()=>{const o=overlays[selOv];if(!o)return;o.start=Math.max(0,+ph.toFixed(1));renderOv();drawNow()};
+$('ovDel').onclick=()=>{if(!overlays[selOv])return;overlays.splice(selOv,1);selOv=-1;renderOv();drawNow()};
+$('ovAnim').onchange=e=>{const o=overlays[selOv];if(!o)return;o.anim=e.target.value;$('ovMove').hidden=!(o.anim==='move'||o.anim==='walk');drawNow()};
+$('ovX2').oninput=ovUp((o,v)=>{o.x2=v/100});$('ovY2').oninput=ovUp((o,v)=>{o.y2=v/100});
+$('ovSpd').oninput=e=>{const o=overlays[selOv];if(!o)return;o.spd=+e.target.value;$('ovSpdV').textContent=o.spd.toFixed(1);drawNow()};
+$('ovFlip').onchange=e=>{const o=overlays[selOv];if(!o)return;o.flip=e.target.checked;drawNow()};
+
+/* ---------- insérer une autre vidéo à la tête de lecture ---------- */
+$('fileIns').onchange=async e=>{
+ const fs=[...e.target.files];e.target.value='';if(!fs.length)return;ensureAudio();
+ if(playing)halt();const list=[];
+ for(const f of fs){
+  if(f.size>400e6){if(!confirm('« '+f.name+' » est très lourd ('+Math.round(f.size/1e6)+' Mo). Le téléphone peut planter. Continuer ?'))continue}
+  try{const m=await probe(f);
+   if(!clips.length&&!list.length){const portrait=m.h>m.w;CW=portrait?720:1280;CH=portrait?1280:720;cv.width=CW;cv.height=CH}
+   list.push({id:uid++,fk:'f'+(uid++),name:f.name.replace(/\.[^.]+$/,'').slice(0,28),file:f,src:m.url,in:0,out:m.dur,vol:1,mute:false,fx:'',zone:newZone()})}
+  catch(err){toast('Impossible de lire « '+f.name+' » (format non pris en charge).')}
+ }
+ if(!list.length)return;
+ insertAt(list);refresh();await seek(clips[selClip].t0);toast(list.length+' vidéo(s) insérée(s) à la tête de lecture');
+};
+
+/* ---------- hauteur de la voix (la durée reste la même) ---------- */
+async function pitchShiftBuf(buf,semi){
+ const r=Math.pow(2,semi/12),len=buf.length,sr=buf.sampleRate,chn=buf.numberOfChannels;
+ const N=2048,Hs=N>>1,Ha=Hs/r,D=256,dec=4,win=new Float32Array(N);
+ for(let i=0;i<N;i++)win[i]=0.5-0.5*Math.cos(2*Math.PI*i/N);
+ const data=[];for(let c=0;c<chn;c++)data.push(buf.getChannelData(c));
+ const ref=data[0],outLen=Math.ceil(len*r)+N*2,out=data.map(()=>new Float32Array(outLen));
+ let prev=0;
+ for(let i=0;;i++){
+  const op=i*Hs;if(op>=len*r)break;
+  let ip;
+  if(i===0)ip=0;
+  else{
+   const nom=Math.round(i*Ha),tg=prev+Hs;ip=nom;
+   if(tg+N<len){let bv=-Infinity;for(let d=-D;d<=D;d+=2){const p=nom+d;if(p<0||p+N>=len)continue;let sum=0;for(let k=0;k<N;k+=dec)sum+=ref[p+k]*ref[tg+k];if(sum>bv){bv=sum;ip=p}}}
+  }
+  if(ip>=len)break;
+  const m=Math.min(N,len-ip);
+  for(let c=0;c<chn;c++){const d=data[c],o=out[c];for(let k=0;k<m;k++)o[op+k]+=d[ip+k]*win[k]}
+  prev=ip;
+  if(i%150===0)await new Promise(r2=>setTimeout(r2));
+ }
+ const res=AC.createBuffer(chn,len,sr);
+ for(let c=0;c<chn;c++){const o=out[c],dst=res.getChannelData(c);for(let j=0;j<len;j++){const pos=j*r,i0=Math.floor(pos),fr=pos-i0,a=o[i0]||0,b2=o[i0+1]||0;dst[j]=a+(b2-a)*fr}}
+ return res;
+}
+$('vPitch').oninput=e=>{$('vPitchV').textContent=e.target.value};
+$('vPitchGo').onclick=async()=>{
+ const v=voices[selVoice];if(!v)return;const st=+$('vPitch').value;
+ if(st===(v.pitch||0)){toast('Cette hauteur est déjà appliquée.');return}
+ ensureAudio();toast(st===0?'Retour à la voix d’origine…':'Traitement de la voix…');
+ try{const src=v.orig||v.buf,b=st===0?src:await pitchShiftBuf(src,st);v.orig=src;v.buf=b;v.pitch=st;renderLane();toast(st===0?'Voix d’origine rétablie':'Hauteur appliquée ('+(st>0?'+':'')+st+' demi-tons)')}
+ catch(e){toast('Traitement impossible sur cette piste.')}
+};
+
+/* ---------- sauvegarde automatique (IndexedDB) ---------- */
+let DB=null,saving=false,again=false,saveTimer=0,saveWarned=false;const savedKeys=new Set();
+const rq=r=>new Promise((res,rej)=>{r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+const txDone=t=>new Promise((res,rej)=>{t.oncomplete=res;t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error)});
+function openDB(){return new Promise((res,rej)=>{if(!window.indexedDB){rej(new Error('idb'));return}const r=indexedDB.open('afribd_montage_db',1);r.onupgradeneeded=()=>{const d=r.result;d.createObjectStore('meta');d.createObjectStore('blobs')};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+function scheduleSave(){if(restoring||!DB)return;clearTimeout(saveTimer);saveTimer=setTimeout(saveNow,500)}
+async function saveNow(){
+ if(!DB||restoring)return;
+ if(saving){again=true;return}
+ saving=true;
+ try{
+  const meta={v:1,uid,CW,CH,selClip,selVoice,selOv,ph,
+   clips:clips.map(c=>({id:c.id,fk:c.fk,type:c.type||'vid',name:c.name,in:c.in,out:c.out,vol:c.vol,mute:c.mute,zoom:!!c.zoom,fx:c.fx||'',zone:c.zone})),
+   voices:voices.map(v=>({id:v.id,name:v.name,start:v.start,vol:v.vol,kind:v.kind,cover:!!v.cover,pitch:v.pitch||0})),
+   overlays:overlays.map(o=>({id:o.id,name:o.name,start:o.start,dur:o.dur,x:o.x,y:o.y,w:o.w,anim:o.anim||'none',spd:o.spd||1,x2:o.x2,y2:o.y2,flip:!!o.flip}))};
+  const want=new Set(),puts=[];
+  clips.forEach(c=>{want.add(c.fk);if(!savedKeys.has(c.fk)&&!puts.some(p=>p[0]===c.fk))puts.push([c.fk,c.file])});
+  voices.forEach(v=>{const k='v'+v.id;want.add(k);if(!savedKeys.has(k))puts.push([k,wavBlob(v.orig||v.buf)]);if(v.pitch){const k2='p'+v.id+'_'+v.pitch;want.add(k2);if(!savedKeys.has(k2))puts.push([k2,wavBlob(v.buf)])}});
+  overlays.forEach(o=>{const k='o'+o.id;want.add(k);if(!savedKeys.has(k))puts.push([k,o.file])});
+  const tx=DB.transaction(['meta','blobs'],'readwrite'),B=tx.objectStore('blobs');
+  puts.forEach(([k,b])=>B.put(b,k));
+  [...savedKeys].forEach(k=>{if(!want.has(k))B.delete(k)});
+  tx.objectStore('meta').put(meta,'state');
+  await txDone(tx);
+  puts.forEach(([k])=>savedKeys.add(k));[...savedKeys].forEach(k=>{if(!want.has(k))savedKeys.delete(k)});
+ }catch(e){if(!saveWarned){saveWarned=true;toast('Sauvegarde automatique impossible (espace insuffisant ?).')}}
+ saving=false;if(again){again=false;scheduleSave()}
+}
+async function restore(){
+ try{DB=await openDB()}catch(e){DB=null;return}
+ restoring=true;
+ try{
+  const meta=await rq(DB.transaction('meta').objectStore('meta').get('state'));
+  const get=k=>rq(DB.transaction('blobs').objectStore('blobs').get(k));
+  if(meta&&meta.clips&&meta.clips.length){
+   const fmap={};
+   for(const m of meta.clips){
+    if(!fmap[m.fk]){const b=await get(m.fk);if(!b)continue;const url=URL.createObjectURL(b);fmap[m.fk]={b,url,img:null};if(m.type==='img'){try{fmap[m.fk].img=await loadImg(url)}catch(e){delete fmap[m.fk];continue}}}
+    const f=fmap[m.fk];savedKeys.add(m.fk);
+    clips.push({id:m.id,fk:m.fk,type:m.type==='img'?'img':undefined,name:m.name,file:f.b,src:f.url,img:f.img||undefined,in:m.in,out:m.out,vol:m.vol,mute:m.mute,zoom:m.zoom,fx:m.fx,zone:m.zone||newZone()});
+   }
+   if(meta.voices&&meta.voices.length){
+    ensureAudio();
+    for(const m of meta.voices){const b=await get('v'+m.id);if(!b)continue;try{const orig=await AC.decodeAudioData(await b.arrayBuffer());let buf=orig;savedKeys.add('v'+m.id);const pt=m.pitch||0;if(pt){const pb=await get('p'+m.id+'_'+pt);if(pb){buf=await AC.decodeAudioData(await pb.arrayBuffer());savedKeys.add('p'+m.id+'_'+pt)}else{try{buf=await pitchShiftBuf(orig,pt)}catch(e){}}}voices.push({id:m.id,name:m.name,buf,orig,pitch:buf===orig?0:pt,start:m.start,dur:orig.duration,vol:m.vol,kind:m.kind,cover:!!m.cover})}catch(e){}}
+   }
+   for(const m of (meta.overlays||[])){const b=await get('o'+m.id);if(!b)continue;try{const url=URL.createObjectURL(b),img=await loadImg(url);overlays.push({id:m.id,name:m.name,file:b,src:url,img,start:m.start,dur:m.dur,x:m.x,y:m.y,w:m.w,anim:m.anim||'none',spd:m.spd||1,x2:m.x2==null?.8:m.x2,y2:m.y2==null?.5:m.y2,flip:!!m.flip});savedKeys.add('o'+m.id)}catch(e){}}
+   if(clips.length){
+    uid=Math.max(meta.uid||1,uid);CW=meta.CW||1280;CH=meta.CH||720;cv.width=CW;cv.height=CH;
+    selClip=clamp(meta.selClip==null?0:meta.selClip,0,clips.length-1);
+    selVoice=voices.length&&meta.selVoice>=0?Math.min(meta.selVoice,voices.length-1):-1;
+    selOv=overlays.length&&meta.selOv>=0?Math.min(meta.selOv,overlays.length-1):-1;
+    restoring=false;refresh();await seek(meta.ph||0);toast('Montage précédent retrouvé');
+   }
+  }
+ }catch(e){}
+ restoring=false;
+}
+$('bReset').onclick=async()=>{
+ if(!clips.length&&!voices.length&&!overlays.length){toast('Le montage est déjà vide.');return}
+ if(!confirm('Vider tout le montage (vidéos, images, voix) ? Cette action est définitive.'))return;
+ if(playing)halt();if(rec)stopRec();
+ clips=[];voices=[];overlays=[];selClip=-1;selVoice=-1;selOv=-1;ph=0;CW=1280;CH=720;cv.width=CW;cv.height=CH;
+ if(DB){try{const tx=DB.transaction(['meta','blobs'],'readwrite');tx.objectStore('meta').clear();tx.objectStore('blobs').clear();await txDone(tx);savedKeys.clear()}catch(e){}}
+ refresh();drawBlank();toast('Montage vidé');
+};
+addEventListener('pagehide',()=>{saveNow()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)saveNow()});
+
+drawBlank();refresh();restore();
 })();
 </script>
 </body>
