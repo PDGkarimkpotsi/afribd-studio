@@ -293,18 +293,21 @@ iframe{width:100%;height:calc(100vh - 150px);min-height:560px;border:0;border-ra
         <p class="small">Chaque vignette = 1 seconde. Les secondes hors découpage sont grisées.</p>
         <div class="framesx" id="iFrames"></div>
         <label for="iIn">Début : <span id="iInV">0.0</span> s</label><input type="range" id="iIn" min="0" max="10" step="0.1" value="0">
+        <div class="buttons"><button class="secondary" id="iInM">⏪ Début −1 s</button><button class="secondary" id="iInP">Début +1 s ⏩</button></div>
         <label for="iOut">Fin : <span id="iOutV">8.0</span> s</label><input type="range" id="iOut" min="0" max="10" step="0.1" value="8">
+        <div class="buttons"><button class="secondary" id="iOutM">⏪ Fin −1 s</button><button class="secondary" id="iOutP">Fin +1 s ⏩</button></div>
         <p class="small" id="iLen"></p>
         <div class="buttons"><button class="primary" id="iOk">✔ Valider et garder dans la case</button><button class="secondary" id="iCancel">✕ Annuler</button></div>
       </div>
       <label class="chk" style="margin-top:16px"><input type="checkbox" id="sgOn" checked> Ajouter la signature sur la vidéo de générique</label>
       <canvas id="iCv" width="640" height="360"></canvas>
+      <div class="buttons" style="margin-top:6px"><button class="primary" id="iPlay">▶ Lire ici la vidéo du générique</button><span class="small" id="iPos"></span></div>
       <label for="sgText">Texte de la signature (écris autre chose avec le clavier si tu veux)</label>
       <input type="text" id="sgText" maxlength="80">
       <div class="buttons" style="margin-top:6px">
         <button class="secondary" id="sgTextReset">↺ Texte d'origine</button>
         <button class="secondary" id="sgPlay">▶ Revoir le mouvement</button>
-        <button class="secondary" id="iView">👁 Voir le générique complet</button>
+        
       </div>
       <label for="sgPos">Emplacement</label>
       <select id="sgPos"><option value="tl">Haut gauche</option><option value="tc">Haut centre</option><option value="tr">Haut droite</option><option value="c">Centre</option><option value="bl">Bas gauche</option><option value="bc">Bas centre</option><option value="br">Bas droite</option><option value="custom">Personnalisé</option></select>
@@ -619,8 +622,14 @@ async function beginXf(){
  if(!playing||si!==my){try{V[b].v.pause()}catch(e){}busy=false;return}
  xf={b,X};busy=false;
 }
+let busyT=0,lastTickW=0;
 function tick(){
  if(!playing)return;
+ lastTickW=performance.now();
+ if(busy){
+  if(!busyT)busyT=performance.now();
+  else if(exporting&&performance.now()-busyT>8000){busyT=0;busy=false;xf=null;lastSi=-1;advance();raf=requestAnimationFrame(tick);return}
+ }else busyT=0;
  if(!busy){
   const s=segs[si];let local;
   if(s.k==='card'){local=(performance.now()-cardT0)/1000;drawCard(s.w,local,s.d)}
@@ -643,6 +652,7 @@ function tick(){
  raf=requestAnimationFrame(tick);
 }
 async function runSegs(list,startFt){
+ try{iplStop()}catch(e){}
  ensureAudio();await AC.resume();
  frameJobs.strip++;frameJobs.intro++;xf=null;lastSi=-1;segs=list;playing=true;busy=true;
  let i=0,local=0;
@@ -838,22 +848,49 @@ function sTxt(){
 }
 $('sMarkA').onclick=()=>{secA=+ph.toFixed(2);if(secB!=null&&secB<=secA)secB=null;sTxt()};
 $('sMarkB').onclick=()=>{secB=+ph.toFixed(2);if(secA!=null&&secA>=secB)secA=null;sTxt()};
+function sliceBuf(b,from,to){
+ const sr=b.sampleRate,i0=Math.max(0,Math.floor(from*sr)),i1=Math.min(b.length,Math.floor(to*sr)),n=Math.max(1,i1-i0);
+ const o=AC.createBuffer(b.numberOfChannels,n,sr);
+ for(let c=0;c<b.numberOfChannels;c++){const d=b.getChannelData(c);o.copyToChannel(d.subarray(i0,Math.min(i1,i0+n)),c,0)}
+ return o;
+}
+function cutVoices(a,b,len){
+ ensureAudio();const out=[];
+ for(const v of voices){
+  const vs=v.start,ve=v.start+v.dur;
+  if(ve<=a){out.push(v);continue}
+  if(vs>=b){v.start=+(vs-len).toFixed(2);out.push(v);continue}
+  const keepL=a-vs,keepR=ve-b,cover=v.cover,r=v.orig&&v.orig!==v.buf?v.orig.duration/v.buf.duration:1;
+  const pieces=[];
+  if(keepL>0.05)pieces.push({buf:sliceBuf(v.buf,0,keepL),orig:(v.orig&&v.orig!==v.buf)?sliceBuf(v.orig,0,keepL*r):null,start:vs,dur:keepL});
+  if(keepR>0.05)pieces.push({buf:sliceBuf(v.buf,b-vs,v.buf.duration),orig:(v.orig&&v.orig!==v.buf)?sliceBuf(v.orig,(b-vs)*r,v.orig.duration):null,start:a,dur:keepR});
+  pieces.forEach((pc,k)=>{
+   const last=k===pieces.length-1;
+   const nv={...v,id:uid++,buf:pc.buf,orig:pc.orig||pc.buf,pitch:pc.orig?v.pitch:0,start:+pc.start.toFixed(2),dur:pc.buf.duration,cover:cover&&last};
+   if(!pc.orig){nv.orig=pc.buf;nv.pitch=0}
+   out.push(nv);
+  });
+ }
+ voices=out;if(selVoice>=voices.length)selVoice=voices.length-1;
+}
 $('sCut').onclick=()=>{
  if(secA==null||secB==null||secB-secA<0.1){toast('Marque d’abord le début et la fin (au moins 0,1 s).');return}
  if(playing)halt();layout();
  const a=secA,b=Math.min(secB,filmDur),len=b-a;if(len<0.1){toast('Section hors de la vidéo.');return}
  if(!confirm('Retirer la section de '+fmt(a)+' à '+fmt(b)+' ('+len.toFixed(1)+' s) ? Les voix, musiques et images posées après cette section seront décalées.'))return;
- undoSnap={clips:clips.map(c=>({...c,zone:{...c.zone}})),voices:voices.map(v=>[v,v.start]),overlays:overlays.map(o=>({...o})),selClip,ph};
+ undoSnap={clips:clips.map(c=>({...c,zone:{...c.zone}})),voices:voices.map(v=>({...v})),overlays:overlays.map(o=>({...o})),selClip,selVoice,ph};
  clips=rippleCut(clips,a,b,()=>uid++);
- voices.forEach(v=>{if(v.start>=b)v.start=+(v.start-len).toFixed(2);else if(v.start>a)v.start=+a.toFixed(2)});
- overlays=overlays.filter(o=>{if(o.start>=b){o.start=+(o.start-len).toFixed(1);return true}if(o.start>a){o.dur-=(b-o.start);o.start=+a.toFixed(1);return o.dur>=0.3}return true});
+ cutVoices(a,b,len);
+ overlays=overlays.filter(o=>{const oe=o.start+o.dur;if(o.start>=b){o.start=+(o.start-len).toFixed(1);return true}if(oe<=a)return true;
+  if(o.start>=a){const rest=oe-b;if(rest<0.3)return false;o.start=+a.toFixed(1);o.dur=+rest.toFixed(1);return true}
+  o.dur=+((oe>b?o.dur-len:a-o.start)).toFixed(1);return o.dur>=0.3});
  selOv=-1;selClip=clips.length?Math.min(Math.max(selClip,0),clips.length-1):-1;
  secA=null;secB=null;sTxt();$('sUndo').disabled=false;
  refresh();renderOv();seek(Math.min(a,Math.max(0,filmDur-0.05)));toast('Section de '+len.toFixed(1)+' s retirée');
 };
 $('sUndo').onclick=()=>{
  if(!undoSnap)return;if(playing)halt();const u=undoSnap;undoSnap=null;
- clips=u.clips;u.voices.forEach(([v,st])=>{v.start=st});overlays=u.overlays;selClip=u.selClip;selOv=-1;
+ clips=u.clips;voices=u.voices;selVoice=Math.min(u.selVoice,voices.length-1);overlays=u.overlays;selClip=u.selClip;selOv=-1;renderLane();
  $('sUndo').disabled=true;refresh();renderOv();seek(u.ph);toast('Retrait annulé');
 };
 
@@ -999,7 +1036,7 @@ $('pvIntro').onclick=()=>previewCard('intro');$('pvOutro').onclick=()=>previewCa
 
 
 /* ---------- réparation du .mp4 enregistré (durée, index, démarrage rapide) ---------- */
-async function fixMp4(blob){
+async function fixMp4(blob,capSec){
  const buf=await blob.arrayBuffer(),dv=new DataView(buf),u8=new Uint8Array(buf),LEN=buf.byteLength;
  const rd32=o=>dv.getUint32(o),rd64=o=>dv.getUint32(o)*4294967296+dv.getUint32(o+4);
  const fcc=o=>String.fromCharCode(u8[o],u8[o+1],u8[o+2],u8[o+3]);
@@ -1037,7 +1074,7 @@ async function fixMp4(blob){
    const tx=trex[id]||{dd:0,ds:0,df:0};if(dd==null)dd=tx.dd;if(df==null)df=tx.df;if(ds==null)ds=tx.ds;
    if(base==null)base=(fl&0x20000)?mf.s:nextOff;
    const tfdt=find(cs,'tfdt');
-   if(tfdt&&T.start==null){const v=u8[tfdt.b];T.start=v?rd64(tfdt.b+4):rd32(tfdt.b+4)}
+   if(tfdt){const v=u8[tfdt.b],tv=v?rd64(tfdt.b+4):rd32(tfdt.b+4);if(T.start==null)T.start=tv;(T.marks=T.marks||[]).push({i:T.samples.length,t:tv})}
    let cur=base;
    for(const tr of cs.filter(x=>x.t==='trun')){
     const ver=u8[tr.b],tf2=rd32(tr.b)&0xffffff,n=rd32(tr.b+4);let p=tr.b+8,doff=null,ff=null;
@@ -1063,10 +1100,43 @@ async function fixMp4(blob){
  use.forEach(T=>{
   const nz=T.samples.filter(x=>x.d>0);const avg=nz.length?Math.round(nz.reduce((a,x)=>a+x.d,0)/nz.length):Math.round(T.ts/30);
   T.samples.forEach(x=>{if(!x.d)x.d=avg});
-  T.dur=T.samples.reduce((a,x)=>a+x.d,0);T.start=T.start||0;
+  T.start=T.start||0;
+  /* l'horloge de chaque fragment (tfdt) fait foi : on recale la durée du dernier échantillon du fragment précédent
+     pour qu'aucune dérive ne s'accumule entre l'image et le son, quelle que soit la durée */
+  const mk=T.marks||[];
+  for(let k=1;k<mk.length;k++){
+   const prev=mk[k-1],cur=mk[k];if(cur.i<=prev.i)continue;
+   let sum=0;for(let j=prev.i;j<cur.i;j++)sum+=T.samples[j].d;
+   const want=cur.t-prev.t,diff=want-sum;
+   if(diff!==0){const L=T.samples[cur.i-1];L.d=Math.max(1,L.d+diff)}
+  }
+  T.dur=T.samples.reduce((a,x)=>a+x.d,0);
  });
  const t0=Math.min(...use.map(T=>T.start/T.ts));
  use.forEach(T=>{T.off=Math.round((T.start/T.ts-t0)*1000);if(T.off>500)T.off=0});/* un décalage > 0,5 s vient d'horloges différentes (temps passé dans l'atelier), pas d'un vrai retard : on aligne les pistes */
+ /* fin commune : jamais de son qui continue seul après l'image, ni de piste plus longue que le montage prévu */
+ {
+  const vt=use.find(T=>T.kind==='vide');
+  let endMs=Math.max(...use.map(T=>T.off+T.dur/T.ts*1000));
+  if(vt)endMs=Math.min(endMs,vt.off+vt.dur/vt.ts*1000+120);
+  if(capSec>0)endMs=Math.min(endMs,capSec*1000+300);
+  use.forEach(T=>{
+   const maxTicks=Math.max(1,Math.round((endMs-T.off)/1000*T.ts));
+   if(T.dur<=maxTicks)return;
+   let acc=0,n=0;for(;n<T.samples.length;n++){if(acc>=maxTicks)break;acc+=T.samples[n].d}
+   n=Math.max(1,n);
+   if(T.kind==='vide'){/* on garde l'image jusqu'à la dernière image-clé utile, sans couper au milieu d'un groupe */}
+   T.samples.length=n;
+   let left=n;const nc=[];
+   for(const c of T.chunks){
+    if(left<=0)break;
+    if(c.n<=left){nc.push(c);left-=c.n}
+    else{/* chunk partiel : taille = somme des tailles des échantillons conservés */
+     const base=T.samples.length-left;let sz=0;for(let j=base;j<base+left;j++)sz+=T.samples[j].s;nc.push({off:c.off,len:sz,n:left});left=0}
+   }
+   T.chunks=nc;T.dur=T.samples.reduce((a,x)=>a+x.d,0);
+  });
+ }
  const movDur=Math.max(...use.map(T=>T.off+Math.round(T.dur/T.ts*1000)));
  /* --- écriture --- */
  const cat=a=>{let n=0;a.forEach(x=>n+=x.length);const o=new Uint8Array(n);let p=0;a.forEach(x=>{o.set(x,p);p+=x.length});return o};
@@ -1141,6 +1211,7 @@ $('bExport').onclick=async()=>{
  expMR=mr;exPaused=null;
  const chunks=[];mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
  const stopped=new Promise(r=>{mr.onstop=r});
+ const expSec=fullSegs().reduce((a,x)=>a+x.d-(x.c&&x.c.x?x.c.x:0),0);
  exporting=true;cancelFlag=false;spk.gain.value=0;monMul=1;
  $('bExport').disabled=true;$('bCancel').hidden=false;$('bar').hidden=false;$('barI').style.width='0';$('expInfo').textContent='Export en cours… reste sur cette page. '+(awake?'L’écran est maintenu allumé.':'Attention : l’écran peut s’éteindre. Touche l’écran de temps en temps ; si tu quittes la page, l’export se met en pause et reprend à ton retour.');
  mr.start(500);
@@ -1154,7 +1225,7 @@ $('bExport').onclick=async()=>{
  let outBlob=new Blob(chunks,{type}),fixed=false,codecWarn=false;
  if(ext==='mp4'){
   $('expInfo').textContent='Finalisation du fichier .mp4 (durée, index, compatibilité TikTok)…';
-  try{outBlob=await fixMp4(outBlob);fixed=true;if(outBlob.codecs&&outBlob.codecs.some(c=>/vp0|av01|opus|Opus/.test(c)))codecWarn=true}catch(err){toast('Finalisation impossible : le fichier brut est enregistré.')}
+  try{outBlob=await fixMp4(outBlob,expSec);fixed=true;if(outBlob.codecs&&outBlob.codecs.some(c=>/vp0|av01|opus|Opus/.test(c)))codecWarn=true}catch(err){toast('Finalisation impossible : le fichier brut est enregistré.')}
  }
  download(outBlob,'montage-afribd.'+ext);
  $('expInfo').textContent='Vidéo exportée (.'+ext+')'+(fixed?' avec durée et index corrects.':'. ')+(codecWarn?' Attention : ce fichier n’utilise pas H.264/AAC, TikTok peut le refuser ; essaie depuis Chrome sur Android.':'')+(ext==='webm'?' Pour TikTok, choisis le format .mp4 si ton navigateur le propose.':' Elle se lit sur Android et se partage sur WhatsApp, TikTok ou YouTube.');toast('Vidéo exportée');
@@ -1206,6 +1277,12 @@ document.addEventListener('visibilitychange',()=>{
  }else if(exPaused)resumeExport();
 });
 
+/* écran éteint / page gelée sans événement : si l'image ne se dessine plus, on met aussi le son en pause (plus de son qui continue seul) */
+setInterval(()=>{
+ if(!exporting)return;
+ if(playing&&!exPaused&&!busy&&lastTickW&&performance.now()-lastTickW>1500)pauseExport();
+ else if(exPaused&&!document.hidden)requestAnimationFrame(()=>{if(exPaused&&exporting)resumeExport()});
+},500);
 $('bCancel').onclick=()=>{if(!exporting)return;cancelFlag=true;exPaused=null;halt();if(endRes){const r=endRes;endRes=null;r()}};
 
 /* ---------- onglets ---------- */
@@ -1418,7 +1495,7 @@ function drawMini(t,d){
 }
 const miniStatic=()=>{cancelAnimationFrame(miniRaf);drawMini(2,100)};
 function miniPlay(){
- cancelAnimationFrame(miniRaf);const d=work?Math.max(1,work.out-work.in):(introData()?introData().out-introData().in:6),t0=performance.now();
+ if(iplOn)iplStop();cancelAnimationFrame(miniRaf);const d=work?Math.max(1,work.out-work.in):(introData()?introData().out-introData().in:6),t0=performance.now();
  const f=()=>{const t=(performance.now()-t0)/1000;drawMini(t,d);if(t<d)miniRaf=requestAnimationFrame(f);else miniStatic()};f();
 }
 async function captureStill(url,dur,t){
@@ -1450,7 +1527,7 @@ $('iIn').oninput=e=>{if(!work)return;let v=+e.target.value;if(v>work.out-0.5){v=
 $('iIn').onchange=()=>{if(work)captureStill(work.url,work.dur,work.in)};
 $('iOut').oninput=e=>{if(!work)return;let v=+e.target.value;if(v<work.in+0.5){v=Math.min(work.dur,work.in+0.5);e.target.value=v}work.out=v;dimFrames()};
 $('iOk').onclick=async()=>{
- const w=work;if(!w)return;if(w.out-w.in<0.5){toast('Choisis une durée d’au moins 0,5 s.');return}
+ iplStop();const w=work;if(!w)return;if(w.out-w.in<0.5){toast('Choisis une durée d’au moins 0,5 s.');return}
  const i=INT.slot-1,d={name:w.name,in:+w.in.toFixed(1),out:+w.out.toFixed(1),dur:w.dur,blob:w.file,url:w.url},old=slots[i];
  if(old&&old.url!==d.url){try{URL.revokeObjectURL(old.url)}catch(e){}}
  slots[i]=d;
@@ -1458,7 +1535,7 @@ $('iOk').onclick=async()=>{
  catch(e){toast('Générique gardé pour cette session seulement (stockage indisponible).')}
  INT.mode='video';saveInt();work=null;$('iEd').hidden=true;frameJobs.intro++;renderIntro();
 };
-$('iCancel').onclick=()=>{if(work&&work.fresh){try{URL.revokeObjectURL(work.url)}catch(e){}}work=null;$('iEd').hidden=true;frameJobs.intro++;miniStatic()};
+$('iCancel').onclick=()=>{iplStop();if(work&&work.fresh){try{URL.revokeObjectURL(work.url)}catch(e){}}work=null;$('iEd').hidden=true;frameJobs.intro++;miniStatic()};
 $('iEdit').onclick=()=>{const d=introData();if(!d)return;startWork({file:d.blob,url:d.url,dur:d.dur,name:d.name,in:d.in,out:d.out,fresh:false})};
 $('iDelSlot').onclick=async()=>{
  const d=introData();if(!d)return;if(!confirm('Vider la case '+INT.slot+' ? La vidéo « '+d.name+' » sera retirée du navigateur.'))return;
@@ -1472,12 +1549,45 @@ $('imVid').onchange=()=>{
  if(!introData()){const k=slots.findIndex(Boolean);INT.slot=k+1}
  INT.mode='video';saveInt();renderIntro();
 };
-$('iView').onclick=async()=>{
+/* lecture du générique directement dans son menu (vidéo + signature), sans remonter à l'écran du haut */
+let ipl=null,iplRaf=0,iplOn=false;
+function iplStop(){
+ iplOn=false;cancelAnimationFrame(iplRaf);if(ipl){try{ipl.pause()}catch(e){}}
+ const b=$('iPlay');if(b)b.textContent='▶ Lire ici la vidéo du générique';
+ const ps=$('iPos');if(ps)ps.textContent='';
+ try{miniStatic()}catch(e){}
+}
+function iplWait(ev,fn,ms){return new Promise(r=>{let d=false;const f=()=>{if(!d){d=true;ipl.removeEventListener(ev,f);r()}};ipl.addEventListener(ev,f);try{fn()}catch(e){f()}setTimeout(f,ms)})}
+$('iPlay').onclick=async()=>{
+ if(iplOn){iplStop();return}
  const o=work||introData();if(!o){toast('Choisis d’abord une vidéo de générique.');return}
- if(playing)halt();ensureAudio();const c=introClipOf(o);
- try{$('cv').scrollIntoView({behavior:'smooth',block:'center'})}catch(e){}
- await runSegs([{k:'clip',c,d:c.d,intro:true}],null);
+ if(playing)halt();cancelAnimationFrame(miniRaf);
+ if(!ipl){ipl=document.createElement('video');ipl.playsInline=true;ipl.preload='auto'}
+ const a=o.in,d=Math.max(0.5,o.out-o.in);iplOn=true;$('iPlay').textContent='⏹ Arrêter';
+ if(ipl._u!==o.url){ipl._u=o.url;await iplWait('loadeddata',()=>{ipl.src=o.url;ipl.load()},6000)}
+ if(!iplOn)return;
+ await iplWait('seeked',()=>{ipl.currentTime=Math.min(a,Math.max(0,(o.dur||a+1)-0.05))},2500);
+ ipl.volume=1;try{await ipl.play()}catch(e){toast('Lecture impossible : touche l’écran puis réessaie.');iplStop();return}
+ const f=()=>{
+  if(!iplOn)return;
+  const t=ipl.currentTime-a;
+  ix.fillStyle='#000';ix.fillRect(0,0,640,360);
+  const vw=ipl.videoWidth||16,vh=ipl.videoHeight||9,k=Math.min(640/vw,360/vh);
+  try{ix.drawImage(ipl,(640-vw*k)/2,(360-vh*k)/2,vw*k,vh*k)}catch(e){}
+  drawSignature(ix,640,360,Math.max(0,t),d,SIG);
+  $('iPos').textContent=Math.max(0,t).toFixed(1)+' / '+d.toFixed(1)+' s';
+  if(t>=d-0.03||ipl.ended){iplStop();return}
+  iplRaf=requestAnimationFrame(f);
+ };
+ f();
 };
+function stepWork(which,delta){
+ if(!work)return;
+ if(which==='in'){let v=Math.min(Math.max(0,work.in+delta),work.out-0.5);v=Math.round(v*10)/10;work.in=v;$('iIn').value=v;dimFrames();captureStill(work.url,work.dur,v)}
+ else{let v=Math.max(Math.min(work.dur,work.out+delta),work.in+0.5);v=Math.round(v*10)/10;work.out=v;$('iOut').value=v;dimFrames();captureStill(work.url,work.dur,Math.max(0,v-0.2))}
+}
+$('iInM').onclick=()=>stepWork('in',-1);$('iInP').onclick=()=>stepWork('in',1);
+$('iOutM').onclick=()=>stepWork('out',-1);$('iOutP').onclick=()=>stepWork('out',1);
 function renderIntro(){
  const vid=INT.mode==='video';
  $('imDef').checked=!vid;$('imVid').checked=vid;
